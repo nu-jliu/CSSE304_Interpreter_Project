@@ -1,4 +1,4 @@
-# CSSE304 `Proraming Language Concepts` Interpreter Project
+# CSSE304 `Programing Language Concepts` Interpreter Project
 Repository for CSSE304 `Programing Language Concepts`
 ## Rose-Hulman Institute of Technology
 ### Author
