@@ -10,7 +10,7 @@
 (define load-all ; make it easy to reload the files
   (lambda ()
     (load "datatypes.ss")
-    ;(load "parse-procs.ss")
+    (load "parse-procs.ss")
     (load "syntax-expand.ss")
     (load "env-procs.ss")
     (load "continuations.ss")

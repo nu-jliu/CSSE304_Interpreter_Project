@@ -7,7 +7,6 @@
 
 ; eval-exp is the main component of the interpreter
 
-    
 (define eval-exp
   (lambda (exp env)
     (cases expression exp
@@ -21,8 +20,8 @@
       [ifelse-exp (ifpred ifdot ifdof)
         (if (eval-exp ifpred env) (eval-exp ifdot env) (eval-exp ifdof env))]
       [let-exp (var-list body)
-        (let ([syms (map (lambda (x) (eval-exp (1st x) env)) var-list)]
-             [vars (map (lambda (x) (eval-exp (2nd x) env)) var-list)])
+        (let ([syms (map 1st var-list)]
+             [vars (map 2nd var-list)])
         (eval-exp body (extend-env syms vars env)))]
       [app-exp (rator rands)
         (let ([proc-value (eval-exp rator env)]
