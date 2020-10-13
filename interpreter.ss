@@ -18,19 +18,26 @@
   (lambda (exp env)
     (cases expression exp
       [lit-exp (datum) datum]
-      [var-exp (id)
-	(apply-env env id)]
+      [var-exp (id) 
+        (apply-env env id)]
       [lambda-exp (id body)
         (closure id body env)]
       [if-exp (ifpred ifdot)
-        (if (eval-exp ifpred env) (eval-exp ifdot env))]
+        (if (eval-exp ifpred env) 
+          (eval-exp ifdot env))]
       [ifelse-exp (ifpred ifdot ifdof)
-        (if (eval-exp ifpred env) (eval-exp ifdot env) (eval-exp ifdof env))]
+        (if (eval-exp ifpred env) 
+          (eval-exp ifdot env) 
+          (eval-exp ifdof env))]
       [let-exp (var-list body)
-        (let ([syms (map (lambda (x) (eval-exp (1st x) env)) var-list)]
-             [vars (map (lambda (x) (eval-exp (2nd x) env)) var-list)])
-          (begin (display syms) (display vars)
-        (eval-exp body (extend-env syms vars env))))]
+        (let ([syms (map (lambda (x) 
+                           (eval-exp (1st x) env)) 
+                         var-list)]
+              [vars (map (lambda (x) 
+                          (eval-exp (2nd x) env)) 
+                         var-list)])
+          (eval-exp body 
+                    (extend-env syms vars env)))]
       [app-exp (rator rands)
         (let ([proc-value (eval-exp rator env)]
               [args (eval-rands rands env)])
@@ -61,15 +68,13 @@
                             caaar caadr cadar caddr cdaar cdadr cddar cdddr list null? assq eq? 
                             equal? atom? length list->vector list? pair? procedure? vector->list vector
                             make-vector vector-ref vector? number? symbol? set-car! set-cdr! vector-set!
-                            display newline
-                            ))
+                            display newline))
 
 (define init-env         ; for now, our initial global environment only contains 
-  (extend-env            ; procedure names.  Recall that an environment associates
-     *prim-proc-names*   ;  a value (not an expression) with an identifier.
-     (map prim-proc      
-          *prim-proc-names*)
-     (empty-env)))
+  (extend-env *prim-proc-names*           ; procedure names.  Recall that an environment associates
+              (map prim-proc                        ;  a value (not an expression) with an identifier.
+                   *prim-proc-names*)
+              (empty-env)))
 
 ; Usually an interpreter must define each 
 ; built-in procedure individually.  We are "cheating" a little bit.
@@ -90,7 +95,9 @@
       [(=) (= (1st args) (2nd args))]
       [(zero?) (if (null? (cdr args))
                    (zero? (1st args))
-                   (eopl:error 'apply-prim-proc "Incorrect number of arguments: ~s" prim-op))]
+                   (eopl:error 'apply-prim-proc 
+                               "Incorrect number of arguments: ~s" 
+                               prim-op))]
       [(not) (not (1st args))];
       [(<) (apply < args)]
       [(>) (apply > args)]
@@ -124,10 +131,12 @@
       [(vector->list) (vector->list (1st args))];
       [(vector) (apply vector args)]
       [(make-vector) (if (not (number? (1st args)))
-                         (eopl:error 'apply-prim-proc "Incorrect type of 1st argument: ~s" prim-op)
+                         (eopl:error 'apply-prim-proc 
+                                     "Incorrect type of 1st argument: ~s" 
+                                     prim-op)
                          (if (null? (cdr args))
-                             (make-vector (1st args))
-                             (make-vector (1st args) (2nd args))))]
+                           (make-vector (1st args))
+                           (make-vector (1st args) (2nd args))))]
       [(vector-ref) (vector-ref (1st args) (2nd args))];
       [(vector?) (vector? (1st args))];
       [(number?) (number? (1st args))];
@@ -137,7 +146,6 @@
       [(vector-set!) (vector-set! (1st args) (2nd args) (3rd args))]
       [(display) (display (1st args))]
       [(newline) (newline)]
-      
       [else (error 'apply-prim-proc 
             "Bad primitive procedure name: ~s" 
             prim-op)])))
