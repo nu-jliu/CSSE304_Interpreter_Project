@@ -6,15 +6,12 @@
   [var-exp        ; variable references
    (id symbol?)]
   [lit-exp        ; "Normal" data.  Did I leave out any types?
-   (datum
-    (lambda (x)
-      (ormap 
-       (lambda (pred) (pred x))
-       (list number? vector? boolean? symbol? string? pair? null?))))]
+    (datum
+      (lambda (x) (ormap (lambda (pred) (pred x))
+                         (list number? vector? boolean? symbol? string? pair? null?))))]
   [app-exp        ; applications
-   (rator expression?)
-   (rands (list-of expression?))]  
-  )
+    (rator expression?)
+    (rands (list-of expression?))])
 
  	
 ;; environment type definitions
@@ -38,6 +35,5 @@
   [closure
     (ids (list-of symbol?))
     (bodies (lambda (x) (or ((list-of expression?) x)
-
-                           (expression? x))))
+                            (expression? x))))
     (env environment?)])

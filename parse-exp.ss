@@ -1,3 +1,35 @@
+Skip to content
+Search or jump to…
+
+Pull requests
+Issues
+Marketplace
+Explore
+ 
+@rhit-liuj9 
+rhit-liuj9
+/
+CSSE304_Interpreter_Project
+Private
+1
+00
+Code
+Issues
+Pull requests
+Actions
+Projects
+Wiki
+Security
+Insights
+Settings
+CSSE304_Interpreter_Project/parse-exp.ss
+
+Ruixin Feng A13 done.
+Latest commit 25ece6a 4 hours ago
+ History
+ 0 contributors
+243 lines (223 sloc)  11.6 KB
+  
 ; Allen Liu, Steven Feng, Xingheng Lin
 
 ; Problem #4
@@ -17,17 +49,15 @@
     (lambda (m)
       (cons 'lambda (cons (map car (cadr m)) (cddr m)))))
 
-
-
-
-
+; Parser
 
 (define-datatype expression expression?
   [var-exp
    (id symbol?)]
   [lambda-exp
    (ids (list-of symbol?))
-   (bodies (lambda (x) (or ((list-of expression?) x) (expression? x))))]
+   (bodies (lambda (x) (or ((list-of expression?) x) 
+                           (expression? x))))]
   [lambda-x-exp
     (id symbol?)
     (bodies (list-of expression?))]
@@ -182,16 +212,15 @@
                                                    (map parse-exp x)) 
                                                  (2nd datum)) 
                                             (map parse-exp (cddr datum)))])]
-                  [(eqv? (1st datum) 'quote)
-		   (lit-exp (cadr datum))]
-		  [else (app-exp (parse-exp (1st datum)) 
+                  [(eqv? (1st datum) 'quote) (lit-exp (cadr datum))]
+		              [else (app-exp (parse-exp (1st datum)) 
                                  (map parse-exp (cdr datum)))])]
           [else (eopl:error 'parse-exp "bad expression: ~s" datum)])))
 
 
 ; (define unparse-exp
 ;   (lambda  (datum)
-;  li   (cases expression datum
+;     (cases expression datum
 ;       [var-exp (id)  id]
 ;       [lit-exp (num) num]
 ;       [lambda-exp (ids bodies) (append (list 'lambda ids) 
