@@ -14,7 +14,7 @@
     (load "syntax-expand.ss")
     (load "env-procs.ss")
     (load "continuations.ss")
-    (load "parse-exp.ss")
+    (load "parse-procs.ss")
     (load "interpreter.ss")))
 
 (load-all)

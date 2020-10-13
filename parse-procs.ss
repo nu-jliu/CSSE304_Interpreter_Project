@@ -7,6 +7,14 @@
 (define 2nd cadr)
 (define 3rd caddr)
 
+(define let->application
+    (lambda (m)
+      (cons (let-helper m) (map cadr (cadr m)))))
+
+(define let-helper
+    (lambda (m)
+      (cons 'lambda (cons (map car (cadr m)) (cddr m)))))
+
 (define parse-exp         
   (lambda (datum)
     (cond [(symbol? datum) (var-exp datum)]
@@ -114,12 +122,10 @@
                                  (map parse-exp (cdr datum)))])]
           [else (eopl:error 'parse-exp "bad expression: ~s" datum)])))
 
-
-
-
-
-
-
-
-
-
+(define var-exp?
+ (lambda  (x)
+   (cases expression x
+     [var-exp (id) id]
+     [lit-exp (num) num]
+     [else #f])))
+(var-exp? (var-exp 'a))
