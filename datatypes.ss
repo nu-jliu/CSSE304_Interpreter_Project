@@ -37,5 +37,7 @@
    (name symbol?)]
   [closure
     (ids (list-of symbol?))
-    (bodies (list-of expression?))
+    (bodies (lambda (x) (or ((list-of expression?) x)
+
+                           (expression? x))))
     (env environment?)])

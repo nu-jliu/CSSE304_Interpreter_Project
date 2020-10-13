@@ -6,14 +6,20 @@
     (eval-exp form init-env)))
 
 ; eval-exp is the main component of the interpreter
-
+(define eval-helper
+  (lambda (body env)
+    (if (null? (cdr body))
+        (eval-exp (car body) env)
+        (begin
+          (eval-exp (car body) env)
+          (eval-helper (cdr body) env)))))
     
 (define eval-exp
   (lambda (exp env)
     (cases expression exp
       [lit-exp (datum) datum]
       [var-exp (id)
-	(apply-env init-env id)]
+	(apply-env env id)]
       [lambda-exp (id body)
         (closure id body env)]
       [if-exp (ifpred ifdot)
@@ -23,7 +29,8 @@
       [let-exp (var-list body)
         (let ([syms (map (lambda (x) (eval-exp (1st x) env)) var-list)]
              [vars (map (lambda (x) (eval-exp (2nd x) env)) var-list)])
-        (eval-exp body (extend-env syms vars env)))]
+          (begin (display syms) (display vars)
+        (eval-exp body (extend-env syms vars env))))]
       [app-exp (rator rands)
         (let ([proc-value (eval-exp rator env)]
               [args (eval-rands rands env)])
@@ -44,6 +51,7 @@
   (lambda (proc-value args)
     (cases proc-val proc-value
       [prim-proc (op) (apply-prim-proc op args)]
+      [closure (id body env) (eval-helper body (extend-env id args env))]
 			; You will add other cases
       [else (error 'apply-proc
                    "Attempt to apply bad procedure: ~s" 
