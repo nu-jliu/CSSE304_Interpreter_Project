@@ -3,7 +3,7 @@
 ;                  
 ; Claude Anderson.  Last modified April, 2014January 2020.
 ; 
-; Your names here: Allen Liu, Xingheng Lin, Steven Feng 
+; Team names here: Allen Liu, Xingheng Lin, Steven Feng 
 
 (load "chez-init.ss") 
 
