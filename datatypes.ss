@@ -39,3 +39,56 @@
     (bodies (lambda (x) (or ((list-of expression?) x)
                             (expression? x))))
     (env environment?)])
+
+
+(define-datatype expression expression?
+  [var-exp
+   (id symbol?)]
+  [lambda-exp
+   (ids (list-of symbol?))
+   (bodies (lambda (x) (or ((list-of expression?) x) 
+                           (expression? x))))]
+  [lambda-x-exp
+    (id symbol?)
+    (bodies (list-of expression?))]
+  [lambdaImp-exp 
+    (ids pair?)
+    (bodies (list-of expression?))]
+  [lit-exp 
+    (lit (lambda (m) #t))]
+  [app-exp
+    (rator expression?)
+    (rands (list-of expression?))]
+  [set!-exp
+    (id symbol?)
+    (val-exp expression?)]
+  [ifelse-exp 
+    (ifpred expression?)
+    (ifdot  expression?)
+    (ifdof  expression?)]
+  [if-exp
+    (ifpred expression?)
+    (ifdot  expression?)]
+  [namedlet-exp
+    (name symbol?)
+    (var-list (list-of (list-of expression?)))
+    (body (list-of expression?))]
+  [let-exp
+    (var-list (list-of (list-of expression?)))
+    (body (list-of expression?))]
+  [let*-exp
+    (var-list (list-of (list-of expression?)))
+    (body (list-of expression?))]
+  [letrec-exp
+    (var-list (list-of (list-of expression?)))
+    (body (list-of expression?))])
+ 
+(define-datatype lit-type lit-type?
+  [an-number
+    (num number?)]
+  [an-string
+    (str string?)]
+  [an-bool
+    (b boolean?)]
+  [an-char
+    (c char?)])
