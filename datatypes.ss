@@ -80,6 +80,17 @@
   [let*-exp
     (var-list (list-of (list-of expression?)))
     (body (list-of expression?))]
+  [begin-exp 
+    (body (list-of expression?))]
+  [cond-exp 
+    (body (list-of (list-of expression?)))]
+  [case-exp
+    (id expression?)
+    (bodies (list-of (lambda (x) (expression? (2nd x)))))]
+  [or-exp
+    (body (list-of expression?))]
+  [and-exp
+    (body (list-of expression?))]
   [letrec-exp
     (var-list (list-of (list-of expression?)))
     (body (list-of expression?))])

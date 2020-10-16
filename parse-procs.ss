@@ -15,6 +15,24 @@
     (lambda (m)
       (cons 'lambda (cons (map car (cadr m)) (cddr m)))))
 
+
+(define let*->let
+  (lambda (m)
+         (let ([args (cadr m)]
+          [body (caddr m)])
+         `  (let*-helper args body))))
+ 
+(define let*-helper
+  (lambda (args body)
+    (if (null? (cdr args))
+      (list 'let args body)
+        (list 'let (list (car args)) (let*-helper (cdr args) body)))))
+ 
+(define let*->application
+  (lambda (m)
+    (let->application (let*->let m))))
+
+
 (define parse-exp         
   (lambda (datum)
     (cond [(symbol? datum) (var-exp datum)]
@@ -95,10 +113,7 @@
                                         (2nd datum))) (eopl:error 'parse-exp 
                                                                   "not a proper list:  ~s" 
                                                                   datum)]
-                          [else (let*-exp (map (lambda (x)   
-                                                 (map parse-exp x))  
-                                               (2nd datum)) 
-                                          (map parse-exp (cddr datum)))])]
+                          [else (parse-exp (let*->application datum))])]
                   [(eqv? (1st datum) 'letrec)
                     (cond [(< (length datum) 3) (eopl:error 'parse-exp 
                                                             "bad input for letrec: ~s" 
@@ -117,6 +132,12 @@
                                                    (map parse-exp x)) 
                                                  (2nd datum)) 
                                             (map parse-exp (cddr datum)))])]
+
+                  [(eqv? (1st datum) 'cond)  (cond-exp (map parse-exp (cdr datum)))]
+                  [(eqv? (1st datum) 'begin) (begin-exp (map parse-exp (cdr datum)))]
+                  [(eqv? (1st datum) 'and)   (and-exp (map parse-exp (cdr datum)))]
+                  [(eqv? (1st datum) 'or)    (or-exp  (map parse-exp (cdr datum)))]
+                  [(eqv? (1st datum) 'case)  (case-exp (2nd datum) (map parse-exp  (cddr datum)))]
                   [(eqv? (1st datum) 'quote) (lit-exp (cadr datum))]
 		              [else (app-exp (parse-exp (1st datum)) 
                                  (map parse-exp (cdr datum)))])]
