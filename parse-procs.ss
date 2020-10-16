@@ -35,7 +35,7 @@
                           [(symbol? (2nd datum))
                             (lambda-x-exp (2nd datum)
                 		                      (map parse-exp (cddr datum)))]
-                          [(not (andmap symbol? (2nd datum)))  (eopl:error 'parse-exp 
+                          [(and (list? (2nd datum)) (not (andmap symbol? (2nd datum))))  (eopl:error 'parse-exp 
                                                                            "lambda argument list: formals must be symbols: ~s" 
                                                                            datum)]
                           ;[(symbol? (3rd datum)) ]

@@ -35,10 +35,11 @@
   [prim-proc
     (name symbol?)]
   [closure
-    (ids (list-of symbol?))
+    (ids (lambda (x) (or (symbol? x) (pair? x) ((list-of symbol?) x))))
     (bodies (lambda (x) (or ((list-of expression?) x)
                             (expression? x))))
-    (env environment?)])
+    (env environment?)]
+  )
 
 
 (define-datatype expression expression?

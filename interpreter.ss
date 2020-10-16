@@ -22,6 +22,13 @@
         (apply-env env id)]
       [lambda-exp (id body)
         (closure id body env)]
+
+      [lambda-x-exp (ids bodies)
+        (closure ids bodies env)
+       ]
+      [lambdaImp-exp(ids bodies)
+        (closure ids bodies env)
+       ]
       [if-exp (ifpred ifdot)
         (if (eval-exp ifpred env) 
           (eval-exp ifdot env))]
@@ -58,16 +65,32 @@
   (lambda (proc-value args)
     (cases proc-val proc-value
       [prim-proc (op) (apply-prim-proc op args)]
-      [closure (id body env) (eval-helper body (extend-env id args env))]
+      [closure (id body env) (cond [(symbol? id)  
+                                   (eval-helper body (extend-env (list id) (list args) env))]
+                                   [((list-of symbol?) id) 
+                                   (eval-helper body (extend-env id args env))]
+                                   [(pair? id) 
+                                   (eval-helper body (extend-env (car (imhelper id args)) (cadr (imhelper id args)) env))])]
+      
 			; You will add other cases
       [else (error 'apply-proc
                    "Attempt to apply bad procedure: ~s" 
                     proc-value)])))
 
+(define imhelper
+    (lambda (ids args)
+      (if (symbol? ids)
+        (list (list ids) (list args))
+          (let ([id-list (car (imhelper (cdr ids) (cdr args)))]
+                [arg-list (cadr (imhelper (cdr ids) (cdr args)))])
+                (list (cons (car ids) id-list) (cons (car args) arg-list))))))
+
+
 (define *prim-proc-names* '(+ - * add1 sub1 cons = / zero? not < > <= >= car cdr caar cadr cdar cddr 
                             caaar caadr cadar caddr cdaar cdadr cddar cdddr list null? assq eq? 
                             equal? atom? length list->vector list? pair? procedure? vector->list vector
                             make-vector vector-ref vector? number? symbol? set-car! set-cdr! vector-set!
+                            map list apply;A14
                             display newline))
 
 (define init-env         ; for now, our initial global environment only contains 
@@ -119,6 +142,13 @@
       [(cdddr) (cdddr (1st args))];
       [(list) args]
       [(null?) (null? (1st args))];
+      [(map)  (apply map 
+                    (lambda (x) (apply-proc (1st args) (list x)))
+                     (cdr args))];A14
+
+      [(list)  args];A14
+      [(apply) (apply apply-proc (1st args) (cdr args))];A14
+
       [(assq) (assq (1st args) (2nd args))];
       [(eq?) (eq? (1st args) (2nd args))];
       [(equal?) (equal? (1st args) (2nd args))];
