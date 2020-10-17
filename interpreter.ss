@@ -36,22 +36,29 @@
         (if (eval-exp ifpred env) 
           (eval-exp ifdot env) 
           (eval-exp ifdof env))]
-      [let-exp (var-list body)
-        (let ([syms (map (lambda (x) 
-                           (eval-exp (1st x) env)) 
-                         var-list)]
-              [vars (map (lambda (x) 
-                          (eval-exp (2nd x) env)) 
-                         var-list)])
-          (eval-exp body 
-                    (extend-env syms vars env)))]
+   ;   [let-exp (var args body)
+    ;    (eval-bodies body 
+     ;               (extend-env vars (map eval-exp args) env))]
       [app-exp (rator rands)
         (let ([proc-value (eval-exp rator env)]
               [args (eval-rands rands env)])
           (apply-proc proc-value args))]
+      [while-exp (test-exp bodies)
+        (let loop ([t test-exp])
+          (if (eval-exp t env)
+            (begin (eval-bodies bodies env) 
+                   (loop t))
+            (eval-exp (app-exp (var-exp 'void) '()) env)))]
       [else (eopl:error 'eval-exp "Bad abstract syntax: ~a" exp)])))
 
 ; evaluate the list of operands, putting results into a list
+
+(define eval-bodies
+  (lambda (bodies env)
+    (if (null? (cdr bodies))
+      (eval-exp (car bodies) env)
+      (begin (eval-exp (car bodies) env)
+        (eval-bodies (cdr bodies) env)))))
 
 (define eval-rands
   (lambda (rands env)
@@ -90,7 +97,7 @@
                             caaar caadr cadar caddr cdaar cdadr cddar cdddr list null? assq eq? 
                             equal? atom? length list->vector list? pair? procedure? vector->list vector
                             make-vector vector-ref vector? number? symbol? set-car! set-cdr! vector-set!
-                            map list apply;A14
+                            map list apply memq void quotient;A14
                             display newline))
 
 (define init-env         ; for now, our initial global environment only contains 
@@ -176,6 +183,9 @@
       [(vector-set!) (vector-set! (1st args) (2nd args) (3rd args))]
       [(display) (display (1st args))]
       [(newline) (newline)]
+      [(memq) (memq (1st args) (2nd args))]
+      [(void) (void)]
+      [(quotient) (quotient (1st args) (2nd args))]
       [else (error 'apply-prim-proc 
             "Bad primitive procedure name: ~s" 
             prim-op)])))
@@ -190,7 +200,7 @@
       (rep))))  ; tail-recursive, so stack doesn't grow.
 
 (define eval-one-exp
-  (lambda (x) (top-level-eval (parse-exp x))))
+  (lambda (x) (top-level-eval (syntax-expand (parse-exp x)))))
 
 
 

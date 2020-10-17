@@ -58,9 +58,9 @@
                                                                            datum)]
                           ;[(symbol? (3rd datum)) ]
                           [(list? (2nd datum)) (lambda-exp (2nd datum)
-                                                           (if (symbol? (3rd datum))
-                                                             (parse-exp (3rd datum))
-                                                             (map parse-exp (cddr datum))))]
+                                                           ;(if (symbol? (3rd datum))
+                                                             ;(parse-exp (3rd datum))
+                                                             (map parse-exp (cddr datum)))]
                           [else (lambdaImp-exp (2nd datum)  
                                                (map parse-exp (cddr datum)))])]
                   [(eqv? (1st datum) 'set!)
@@ -98,7 +98,9 @@
                                         (2nd datum))) (eopl:error 'parse-exp 
                                                                   "not a proper list: ~s" 
                                                                   datum)]
-                         [else (parse-exp (let->application datum))])]
+                         [else (let-exp (map 1st (2nd datum))
+                                        (map parse-exp (map 2nd (2nd datum)))
+                                        (map parse-exp (cddr datum)))])]
                   [(eqv? (1st datum) 'let*)
                     (cond [(< (length datum) 3) (eopl:error 'parse-exp 
                                                             "bad input for let*: ~s" 
@@ -113,7 +115,9 @@
                                         (2nd datum))) (eopl:error 'parse-exp 
                                                                   "not a proper list:  ~s" 
                                                                   datum)]
-                          [else (parse-exp (let*->application datum))])]
+                          [else (let*-exp (map 1st (2nd datum))
+                                          (map parse-exp (map 2nd (2nd datum)))
+                                          (map parse-exp (cddr datum)))])]
                   [(eqv? (1st datum) 'letrec)
                     (cond [(< (length datum) 3) (eopl:error 'parse-exp 
                                                             "bad input for letrec: ~s" 
@@ -133,15 +137,35 @@
                                                  (2nd datum)) 
                                             (map parse-exp (cddr datum)))])]
 
-                  [(eqv? (1st datum) 'cond)  (cond-exp (map parse-exp (cdr datum)))]
+                  [(eqv? (1st datum) 'cond)  (cond-exp (map (lambda (x) 
+                                                              (list (parse-exp (car x))
+                                                                    (parse-exp (cadr x)))) (cdr datum)))]
                   [(eqv? (1st datum) 'begin) (begin-exp (map parse-exp (cdr datum)))]
                   [(eqv? (1st datum) 'and)   (and-exp (map parse-exp (cdr datum)))]
                   [(eqv? (1st datum) 'or)    (or-exp  (map parse-exp (cdr datum)))]
-                  [(eqv? (1st datum) 'case)  (case-exp (2nd datum) (map parse-exp  (cddr datum)))]
+                  [(eqv? (1st datum) 'case)  (case-exp (parse-exp (2nd datum)) 
+                                                       (case-helper (map (lambda (x) 
+                                                              (if (list? (1st x))
+                                                                (1st x)
+                                                                (list (1st x)))) (cddr datum)))
+                                                        (map (lambda (x) 
+                                                              (map parse-exp x)) (map cdr (cddr datum))))]
+                  [(eqv? (1st datum) 'while) (if (< (length datum) 3)
+                                               (eopl:error 'parse-exp
+                                                           "while body cannot be empty: ~s"
+                                                           datum)
+                                               (while-exp (parse-exp (2nd datum)) 
+                                                          (map parse-exp (cddr datum))))]
                   [(eqv? (1st datum) 'quote) (lit-exp (cadr datum))]
 		              [else (app-exp (parse-exp (1st datum)) 
                                  (map parse-exp (cdr datum)))])]
           [else (eopl:error 'parse-exp "bad expression: ~s" datum)])))
+
+(define case-helper
+  (lambda (lst)
+    (cond [(null? lst) '()]
+          [(equal? (car lst) '(else)) '()]
+          [else (cons (car lst) (case-helper (cdr lst)))])))
 
 (define var-exp?
  (lambda  (x)

@@ -72,13 +72,21 @@
     (ifdot  expression?)]
   [namedlet-exp
     (name symbol?)
-    (var-list (list-of (list-of expression?)))
+    ;(var-list (list-of (list-of expression?)))
+    ;(body (list-of expression?))
+    (vars (list-of symbol?))
+    (args (list-of expression?))
     (body (list-of expression?))]
   [let-exp
-    (var-list (list-of (list-of expression?)))
+    ;(var-list (list-of (list-of expression?)))
+    ;(body (list-of expression?))
+    (vars (list-of symbol?))
+    (args (list-of expression?))
     (body (list-of expression?))]
   [let*-exp
-    (var-list (list-of (list-of expression?)))
+ ;   (var-list (list-of (list-of expression?)))
+    (vars (list-of symbol?))
+    (args (list-of expression?))
     (body (list-of expression?))]
   [begin-exp 
     (body (list-of expression?))]
@@ -86,14 +94,18 @@
     (body (list-of (list-of expression?)))]
   [case-exp
     (id expression?)
-    (bodies (list-of (lambda (x) (expression? (2nd x)))))]
+    (cases (list-of list?))
+    (evals (list-of (list-of expression?)))]
   [or-exp
     (body (list-of expression?))]
   [and-exp
     (body (list-of expression?))]
   [letrec-exp
     (var-list (list-of (list-of expression?)))
-    (body (list-of expression?))])
+    (body (list-of expression?))]
+  [while-exp
+    (test-exp expression?)
+    (bodies (list-of expression?))])
  
 (define-datatype lit-type lit-type?
   [an-number
