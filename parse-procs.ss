@@ -7,32 +7,6 @@
 (define 2nd cadr)
 (define 3rd caddr)
 
-;(define let->application
-;    (lambda (m)
-;      (cons (let-helper m) (map cadr (cadr m)))))
-
-;(define let-helper
-;    (lambda (m)
-;      (cons 'lambda (cons (map car (cadr m)) (cddr m)))))
-
-
-;(define let*->let
-;  (lambda (m)
-;         (let ([args (cadr m)]
-;          [body (caddr m)])
-;           (let*-helper args body))))
- 
-;(define let*-helper
-;  (lambda (args body)
-;    (if (null? (cdr args))
-;      (list 'let args body)
-;        (list 'let (list (car args)) (let*-helper (cdr args) body)))))
- 
-;(define let*->application
-;  (lambda (m)
-;    (let->application (let*->let m))))
-
-
 (define parse-exp         
   (lambda (datum)
     (cond [(symbol? datum) (var-exp datum)]
@@ -57,7 +31,6 @@
                                 (not (andmap symbol? (2nd datum))))  (eopl:error 'parse-exp 
                                                                                  "lambda argument list: formals must be symbols: ~s" 
                                                                                  datum)]
-                          ;[(symbol? (3rd datum)) ]
                           [(list? (2nd datum)) (lambda-exp (2nd datum)
                                                            (map parse-exp (cddr datum)))]
                           [else (lambdaImp-exp (2nd datum)  

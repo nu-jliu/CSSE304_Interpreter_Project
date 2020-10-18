@@ -72,19 +72,14 @@
     (ifdot  expression?)]
   [namedlet-exp
     (name symbol?)
-    ;(var-list (list-of (list-of expression?)))
-    ;(body (list-of expression?))
     (vars (list-of symbol?))
     (args (list-of expression?))
     (body (list-of expression?))]
   [let-exp
-    ;(var-list (list-of (list-of expression?)))
-    ;(body (list-of expression?))
     (vars (list-of symbol?))
     (args (list-of expression?))
     (body (list-of expression?))]
   [let*-exp
- ;   (var-list (list-of (list-of expression?)))
     (vars (list-of symbol?))
     (args (list-of expression?))
     (body (list-of expression?))]
