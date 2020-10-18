@@ -23,8 +23,8 @@
               (syntax-expand (let-exp (list 'tmp)
                                       (list (syntax-expand (car body)))
               (list (ifelse-exp (var-exp 'tmp)
-                          (var-exp 'tmp)
-                          (or-to-if (cdr body)))))))))]
+                                (var-exp 'tmp)
+                                (or-to-if (cdr body)))))))))]
 	    [and-exp (body)
         (let and-to-if ([body body])
           (if (null? body)
@@ -33,36 +33,20 @@
                         (and-to-if (cdr body))
                         (lit-exp #f))))]
 	    [case-exp (id cases evals)
-        (syntax-expand (let-exp ;(list (list (lit-exp 'temp) id))
-          (list 'temp)
-          (list id)
-          (list (let case-to-if ([cases cases]
-                         [evals evals])
-          (if (null? cases)
-            (if (not (null? evals))
-              (begin-exp (1st evals))
-              (app-exp (var-exp 'void) '()))
-            (ifelse-exp (app-exp (var-exp 'memq) (list (var-exp 'temp) (lit-exp (car cases))))
-                        (begin-exp (car evals))
-                        (case-to-if (cdr cases) (cdr evals))))))))]
-         ; (let ([val (caar body)]
-         ;       [to-do (cadar body)])
-         ;   (if (null? (cdr body))
-         ;     (if (list? val)
-         ;       (if-exp (apply or-exp (map (lambda (x) 
-         ;                                    (app-exp (var-exp 'eq?)
-         ;                                             (list (syntax-expand id)
-         ;                                                   (syntax-expand x))))
-         ;                                  val))
-         ;               to-do)
-           ;     (if-exp (app-exp (var-exp 'eq?) 
-         ;;                      (list id val))
-             ;         to-do))
-            ;  (ifelse-exp (app-exp (var-exp 'eq?)
-              ;                     (list id val))
-               ;           to-do
-                ;          (case-to-if (cdr body))))))]
-	    
+        (syntax-expand (let-exp (list 'temp)
+                                (list id)
+                                (list (let case-to-if ([cases cases]
+                                                       [evals evals])
+                                        (if (null? cases)
+                                          (if (not (null? evals))
+                                            (begin-exp (1st evals))
+                                            (app-exp (var-exp 'void) '()))
+                                          (ifelse-exp (app-exp (var-exp 'memq) 
+                                                               (list (var-exp 'temp) 
+                                                                     (lit-exp (car cases))))
+                                                      (begin-exp (car evals))
+                                                      (case-to-if (cdr cases) 
+                                                                  (cdr evals))))))))]
       [begin-exp (body)
         (syntax-expand (app-exp (lambda-exp '() body) '()))]  
       [lambda-exp (id body)
@@ -89,7 +73,6 @@
                                 (if (null? (cdr vars))
                                   body
                                   (list (let*-exp (cdr vars)
-                                            (cdr args)
-                                            body)))))]
-      [else exp] 
-       )))
+                                                  (cdr args)
+                                                  body)))))]
+      [else exp])))

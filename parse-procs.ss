@@ -7,30 +7,30 @@
 (define 2nd cadr)
 (define 3rd caddr)
 
-(define let->application
-    (lambda (m)
-      (cons (let-helper m) (map cadr (cadr m)))))
+;(define let->application
+;    (lambda (m)
+;      (cons (let-helper m) (map cadr (cadr m)))))
 
-(define let-helper
-    (lambda (m)
-      (cons 'lambda (cons (map car (cadr m)) (cddr m)))))
+;(define let-helper
+;    (lambda (m)
+;      (cons 'lambda (cons (map car (cadr m)) (cddr m)))))
 
 
-(define let*->let
-  (lambda (m)
-         (let ([args (cadr m)]
-          [body (caddr m)])
-         `  (let*-helper args body))))
+;(define let*->let
+;  (lambda (m)
+;         (let ([args (cadr m)]
+;          [body (caddr m)])
+;           (let*-helper args body))))
  
-(define let*-helper
-  (lambda (args body)
-    (if (null? (cdr args))
-      (list 'let args body)
-        (list 'let (list (car args)) (let*-helper (cdr args) body)))))
+;(define let*-helper
+;  (lambda (args body)
+;    (if (null? (cdr args))
+;      (list 'let args body)
+;        (list 'let (list (car args)) (let*-helper (cdr args) body)))))
  
-(define let*->application
-  (lambda (m)
-    (let->application (let*->let m))))
+;(define let*->application
+;  (lambda (m)
+;    (let->application (let*->let m))))
 
 
 (define parse-exp         
@@ -53,14 +53,13 @@
                           [(symbol? (2nd datum))
                             (lambda-x-exp (2nd datum)
                 		                      (map parse-exp (cddr datum)))]
-                          [(and (list? (2nd datum)) (not (andmap symbol? (2nd datum))))  (eopl:error 'parse-exp 
-                                                                           "lambda argument list: formals must be symbols: ~s" 
-                                                                           datum)]
+                          [(and (list? (2nd datum)) 
+                                (not (andmap symbol? (2nd datum))))  (eopl:error 'parse-exp 
+                                                                                 "lambda argument list: formals must be symbols: ~s" 
+                                                                                 datum)]
                           ;[(symbol? (3rd datum)) ]
                           [(list? (2nd datum)) (lambda-exp (2nd datum)
-                                                           ;(if (symbol? (3rd datum))
-                                                             ;(parse-exp (3rd datum))
-                                                             (map parse-exp (cddr datum)))]
+                                                           (map parse-exp (cddr datum)))]
                           [else (lambdaImp-exp (2nd datum)  
                                                (map parse-exp (cddr datum)))])]
                   [(eqv? (1st datum) 'set!)
@@ -139,7 +138,8 @@
 
                   [(eqv? (1st datum) 'cond)  (cond-exp (map (lambda (x) 
                                                               (list (parse-exp (car x))
-                                                                    (parse-exp (cadr x)))) (cdr datum)))]
+                                                                    (parse-exp (cadr x)))) 
+                                                            (cdr datum)))]
                   [(eqv? (1st datum) 'begin) (begin-exp (map parse-exp (cdr datum)))]
                   [(eqv? (1st datum) 'and)   (and-exp (map parse-exp (cdr datum)))]
                   [(eqv? (1st datum) 'or)    (or-exp  (map parse-exp (cdr datum)))]
@@ -149,7 +149,8 @@
                                                                 (1st x)
                                                                 (list (1st x)))) (cddr datum)))
                                                         (map (lambda (x) 
-                                                              (map parse-exp x)) (map cdr (cddr datum))))]
+                                                               (map parse-exp x)) 
+                                                             (map cdr (cddr datum))))]
                   [(eqv? (1st datum) 'while) (if (< (length datum) 3)
                                                (eopl:error 'parse-exp
                                                            "while body cannot be empty: ~s"
@@ -165,7 +166,8 @@
   (lambda (lst)
     (cond [(null? lst) '()]
           [(equal? (car lst) '(else)) '()]
-          [else (cons (car lst) (case-helper (cdr lst)))])))
+          [else (cons (car lst) 
+                      (case-helper (cdr lst)))])))
 
 (define var-exp?
  (lambda  (x)
