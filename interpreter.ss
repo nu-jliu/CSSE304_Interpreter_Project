@@ -49,6 +49,8 @@
             (begin (eval-bodies bodies env) 
                    (loop t))
             (eval-exp (app-exp (var-exp 'void) '()) env)))]
+      [letrec-exp (proc-names idss bodiess letrec-bodies)
+        (eval-bodies letrec-bodies (extend-env-recursively proc-names idss bodiess env))]
       [else (eopl:error 'eval-exp "Bad abstract syntax: ~a" exp)])))
 
 ; evaluate the list of operands, putting results into a list
@@ -94,10 +96,10 @@
 
 
 (define *prim-proc-names* '(+ - * add1 sub1 cons = / zero? not < > <= >= car cdr caar cadr cdar cddr 
-                            caaar caadr cadar caddr cdaar cdadr cddar cdddr list null? assq eq? 
+                            caaar caadr cadar caddr cdaar cdadr cddar cdddr list null? assq eq? eqv?
                             equal? atom? length list->vector list? pair? procedure? vector->list vector
                             make-vector vector-ref vector? number? symbol? set-car! set-cdr! vector-set!
-                            map list apply memq void quotient;A14
+                            map list apply memq void quotient append list-tail;A14
                             display newline))
 
 (define init-env         ; for now, our initial global environment only contains 
@@ -152,17 +154,16 @@
       [(map)  (apply map 
                     (lambda (x) (apply-proc (1st args) (list x)))
                      (cdr args))];A14
-
-      [(list)  args];A14
       [(apply) (apply apply-proc (1st args) (cdr args))];A14
-
       [(assq) (assq (1st args) (2nd args))];
       [(eq?) (eq? (1st args) (2nd args))];
+      [(eqv?) (eqv? (1st args) (2nd args))];
       [(equal?) (equal? (1st args) (2nd args))];
       [(atom?) (atom? (1st args))];
       [(length) (length (1st args))];
       [(list->vector) (list->vector (1st args))];
       [(list?) (list? (1st args))];
+      [(list-tail) (list-tail (1st args) (2nd args))];
       [(pair?) (pair? (1st args))];
       [(procedure?) (proc-val? (1st args))];
       [(vector->list) (vector->list (1st args))];
@@ -186,6 +187,7 @@
       [(memq) (memq (1st args) (2nd args))]
       [(void) (void)]
       [(quotient) (quotient (1st args) (2nd args))]
+      [(append) (append (1st args) (2nd args))]
       [else (error 'apply-prim-proc 
             "Bad primitive procedure name: ~s" 
             prim-op)])))

@@ -56,9 +56,8 @@
                                                             "bad input for let: ~s" 
                                                             datum)]
                           [(symbol? (2nd datum)) (namedlet-exp (2nd datum) 
-                                                               (map (lambda (x)   
-                                                                      (map parse-exp x)) 
-                                                                    (3rd datum)) 
+                                                               (map 1st (3rd datum))
+                                                               (map parse-exp (map 2nd (3rd datum)))
                                                                (map parse-exp (cdddr datum)))]
                           [(not (list? (2nd datum))) (eopl:error 'parse-exp 
                                                                  "let* declarations not a list: ~s"
@@ -95,7 +94,7 @@
                                                             "bad input for letrec: ~s" 
                                                             datum)]
  				                  [(not (list? (2nd datum))) (eopl:error 'parse-exp 
-                                                                 "let* declarations not a list: ~s"
+                                                                 "letrec declarations not a list: ~s"
                                                                  datum) ]
                           [(not (andmap (lambda (x) 
                                           (and (list? x) 
@@ -104,9 +103,11 @@
                                         (2nd datum))) (eopl:error 'parse-exp 
                                                                   "not a proper list: ~s" 
                                                                   datum)]
-                          [else (letrec-exp (map (lambda (x)   
-                                                   (map parse-exp x)) 
-                                                 (2nd datum)) 
+                          [else (letrec-exp (map car (2nd datum))
+                                            (map (lambda (x) (2nd (2nd x)))
+                                                 (2nd datum))
+                                            (map (lambda (x) (map parse-exp (cddr (2nd x))))
+                                                 (2nd datum))
                                             (map parse-exp (cddr datum)))])]
 
                   [(eqv? (1st datum) 'cond)  (cond-exp (map (lambda (x) 

@@ -75,4 +75,14 @@
                                   (list (let*-exp (cdr vars)
                                                   (cdr args)
                                                   body)))))]
+      [namedlet-exp (name vars args body)
+        (syntax-expand (letrec-exp (list name)
+                                   (list vars)
+                                   (list body)
+                                   (list (app-exp (var-exp name) args))))]
+      [letrec-exp (proc-names idss bodiess letrec-bodies)
+        (letrec-exp proc-names
+                    idss
+                    (map (lambda (x) (map syntax-expand x)) bodiess)
+                    (map syntax-expand letrec-bodies))]
       [else exp])))

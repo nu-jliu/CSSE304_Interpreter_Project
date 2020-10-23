@@ -82,6 +82,11 @@
     (vars (list-of symbol?))
     (args (list-of expression?))
     (body (list-of expression?))]
+  [letrec-exp
+    (proc-names (list-of symbol?))
+    (idss (list-of (list-of symbol?)))
+    (bodiess (list-of (list-of expression?)))
+    (letrec-bodies (list-of expression?))]
   [begin-exp 
     (body (list-of expression?))]
   [cond-exp 
@@ -93,9 +98,6 @@
   [or-exp
     (body (list-of expression?))]
   [and-exp
-    (body (list-of expression?))]
-  [letrec-exp
-    (var-list (list-of (list-of expression?)))
     (body (list-of expression?))]
   [while-exp
     (test-exp expression?)

@@ -16,6 +16,28 @@
 	    [(eq? sym (car los)) pos]
 	    [else (loop (cdr los) (add1 pos))]))))
 	    
+(define extend-env-recursively
+  (lambda  (proc-names idss bodiess old-env)
+    (let ([len (length proc-names)])
+      (let ([vec (make-list len 0)])
+        (let ([env (extended-env-record proc-names
+                                        vec
+                                        old-env)])
+          (for-each (lambda (pos ids bodies)
+                      (list-set vec
+                                pos
+                                (closure ids bodies env)))
+                    (iota len)
+                    idss
+                    bodiess)
+          env)))))
+
+(define list-set
+  (lambda (ls pos val)
+    (if (zero? pos)
+      (set-car! ls val)
+      (list-set (cdr ls) (- pos 1) val))))
+
 (define apply-env
   (lambda (env sym) 
     (cases environment env 
