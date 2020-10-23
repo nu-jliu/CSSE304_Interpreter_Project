@@ -22,13 +22,10 @@
         (apply-env env id)]
       [lambda-exp (id body)
         (closure id body env)]
-
       [lambda-x-exp (ids bodies)
-        (closure ids bodies env)
-       ]
+        (closure ids bodies env)]
       [lambdaImp-exp(ids bodies)
-        (closure ids bodies env)
-       ]
+        (closure ids bodies env)]
       [if-exp (ifpred ifdot)
         (if (eval-exp ifpred env) 
           (eval-exp ifdot env))]
@@ -36,9 +33,6 @@
         (if (eval-exp ifpred env) 
           (eval-exp ifdot env) 
           (eval-exp ifdof env))]
-   ;   [let-exp (var args body)
-    ;    (eval-bodies body 
-     ;               (extend-env vars (map eval-exp args) env))]
       [app-exp (rator rands)
         (let ([proc-value (eval-exp rator env)]
               [args (eval-rands rands env)])
@@ -50,7 +44,10 @@
                    (loop t))
             (eval-exp (app-exp (var-exp 'void) '()) env)))]
       [letrec-exp (proc-names idss bodiess letrec-bodies)
-        (eval-bodies letrec-bodies (extend-env-recursively proc-names idss bodiess env))]
+        (eval-bodies letrec-bodies 
+                     (extend-env-recursively proc-names 
+                                             idss bodiess 
+                                             env))]
       [else (eopl:error 'eval-exp "Bad abstract syntax: ~a" exp)])))
 
 ; evaluate the list of operands, putting results into a list
@@ -74,12 +71,18 @@
   (lambda (proc-value args)
     (cases proc-val proc-value
       [prim-proc (op) (apply-prim-proc op args)]
-      [closure (id body env) (cond [(symbol? id)  
-                                   (eval-helper body (extend-env (list id) (list args) env))]
-                                   [((list-of symbol?) id) 
-                                   (eval-helper body (extend-env id args env))]
-                                   [(pair? id) 
-                                   (eval-helper body (extend-env (car (imhelper id args)) (cadr (imhelper id args)) env))])]
+      [closure (id body env) (cond [(symbol? id) (eval-helper body 
+                                                              (extend-env (list id) 
+                                                                          (list args) 
+                                                                          env))]
+                                   [((list-of symbol?) id) (eval-helper body 
+                                                                        (extend-env id 
+                                                                                    args 
+                                                                                    env))]
+                                   [(pair? id) (eval-helper body 
+                                                            (extend-env (car (imhelper id args)) 
+                                                                        (cadr (imhelper id args)) 
+                                                                        env))])]
       
 			; You will add other cases
       [else (error 'apply-proc
@@ -90,9 +93,10 @@
     (lambda (ids args)
       (if (symbol? ids)
         (list (list ids) (list args))
-          (let ([id-list (car (imhelper (cdr ids) (cdr args)))]
-                [arg-list (cadr (imhelper (cdr ids) (cdr args)))])
-                (list (cons (car ids) id-list) (cons (car args) arg-list))))))
+        (let ([id-list (car (imhelper (cdr ids) (cdr args)))]
+              [arg-list (cadr (imhelper (cdr ids) (cdr args)))])
+          (list (cons (car ids) id-list) 
+                (cons (car args) arg-list))))))
 
 
 (define *prim-proc-names* '(+ - * add1 sub1 cons = / zero? not < > <= >= car cdr caar cadr cdar cddr 
@@ -114,9 +118,6 @@
 (define apply-prim-proc
   (lambda (prim-proc args)
     (case prim-proc
-      ;[(+) (+ (1st args) (2nd args))]
-      ;[(-) (- (1st args) (2nd args))]
-      ;[(*) (* (1st args) (2nd args))]
       [(+) (apply + args)]
       [(-) (apply - args)]
       [(*) (apply * args)]
@@ -203,13 +204,3 @@
 
 (define eval-one-exp
   (lambda (x) (top-level-eval (syntax-expand (parse-exp x)))))
-
-
-
-
-
-
-
-
-
-

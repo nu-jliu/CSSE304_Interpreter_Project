@@ -83,6 +83,8 @@
       [letrec-exp (proc-names idss bodiess letrec-bodies)
         (letrec-exp proc-names
                     idss
-                    (map (lambda (x) (map syntax-expand x)) bodiess)
+                    (map (lambda (x) 
+                           (map syntax-expand x)) 
+                         bodiess)
                     (map syntax-expand letrec-bodies))]
       [else exp])))
