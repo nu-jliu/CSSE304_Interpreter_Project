@@ -60,6 +60,11 @@
   [lambda-x-exp
     (id symbol?)
     (bodies (list-of expression?))]
+  [for-exp 
+    (init (list-of expression?))
+    (test expression?)
+    (update (list-of expression?))
+    (bodies (list-of expression?))]
   [lambdaImp-exp 
     (ids pair?)
     (bodies (list-of expression?))]

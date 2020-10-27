@@ -81,6 +81,12 @@
                                   (list (let*-exp (cdr vars)
                                                   (cdr args)
                                                   body)))))]
+      [for-exp (init test update bodies)
+                        (syntax-expand (begin-exp (append (if (null? init)
+                                                            (list (app-exp (var-exp 'void) '())) init)
+                                                        (list (while-exp test
+                                                              (append bodies (if (null? update)
+                                                                      (list (app-exp (var-exp 'void) '())))))))))]
       [namedlet-exp (name vars args body)
         (syntax-expand (letrec-exp (list name)
                                    (list vars)

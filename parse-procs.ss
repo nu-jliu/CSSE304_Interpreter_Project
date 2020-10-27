@@ -115,6 +115,10 @@
                                                                     (parse-exp (cadr x)))) 
                                                             (cdr datum)))]
                   [(eqv? (1st datum) 'begin) (begin-exp (map parse-exp (cdr datum)))]
+                  [(eqv? (1st datum) 'for) (for-exp (map parse-exp (car (2nd datum))) 
+                                            (parse-exp (caddr (2nd datum))) 
+                                            (map parse-exp (cddddr (2nd datum)))
+                                            (map parse-exp (cddr datum)))]
                   [(eqv? (1st datum) 'and)   (and-exp (map parse-exp (cdr datum)))]
                   [(eqv? (1st datum) 'or)    (or-exp  (map parse-exp (cdr datum)))]
                   [(eqv? (1st datum) 'case)  (case-exp (parse-exp (2nd datum)) 
