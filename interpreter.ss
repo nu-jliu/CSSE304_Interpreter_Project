@@ -147,7 +147,7 @@
   (extend-env *prim-proc-names*           ; procedure names.  Recall that an environment associates
               (map prim-proc                        ;  a value (not an expression) with an identifier.
                    *prim-proc-names*)
-              init-global-env))
+              (empty-env)))
 ; Usually an interpreter must define each 
 ; built-in procedure individually.  We are "cheating" a little bit.
 
