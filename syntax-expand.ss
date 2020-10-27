@@ -51,6 +51,10 @@
         (syntax-expand (app-exp (lambda-exp '() body) '()))]  
       [lambda-exp (id body)
         (lambda-exp id (map syntax-expand body))]
+      [case-lambda-exp (idss bodiess)
+        (case-lambda-exp idss (map (lambda (x) map syntax-expand x) bodiess))]
+      [set!-exp (id val-exp)
+        (set!-exp id (syntax-expand val-exp))]
       [lambda-x-exp (ids bodies)
         (lambda-x-exp ids (map syntax-expand bodies))]
       [lambdaImp-exp (ids bodies)
@@ -67,6 +71,8 @@
                  (map syntax-expand rands))]
       [let-exp (vars args body)
         (syntax-expand (app-exp (lambda-exp vars body) args))]
+      [while-exp (test-exp bodies) 
+        (while-exp (syntax-expand test-exp) (map syntax-expand bodies))]
       [let*-exp (vars args body)
         (syntax-expand (let-exp (list (car vars))
                                 (list (car args))
@@ -87,4 +93,8 @@
                            (map syntax-expand x)) 
                          bodiess)
                     (map syntax-expand letrec-bodies))]
-      [else exp])))
+      [define-exp (id val)
+           (define-exp id (syntax-expand val))]
+      [var-exp (id) exp]
+      [lit-exp (lit) exp]
+    )))
