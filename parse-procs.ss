@@ -125,6 +125,11 @@
                                                         (map (lambda (x) 
                                                                (map parse-exp x)) 
                                                              (map cdr (cddr datum))))]
+                  [(eqv? (1st datum) 'define) (define-exp (2nd datum) (parse-exp (3rd datum)))]
+                  [(eqv? (1st datum) 'case-lambda) (case-lambda-exp (map car (cdr datum))
+                                                                    (map (lambda (x) 
+                                                                           (map parse-exp (cdr x)))
+                                                                         (cdr datum)))]
                   [(eqv? (1st datum) 'while) (if (< (length datum) 3)
                                                (eopl:error 'parse-exp
                                                            "while body cannot be empty: ~s"

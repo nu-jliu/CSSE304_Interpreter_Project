@@ -27,7 +27,7 @@
 
 ;;; This is an r5rs-compliant datatype system.
 
-;;; exports define-datatype, isa, cases, list-of?, always?
+;;; exports define-datatype, isa, cases, list-of, always?
 ;;; test with (define-datatype:test-all)
 
 

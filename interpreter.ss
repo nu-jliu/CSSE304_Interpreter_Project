@@ -24,8 +24,10 @@
         (closure id body env)]
       [lambda-x-exp (ids bodies)
         (closure ids bodies env)]
-      [lambdaImp-exp(ids bodies)
+      [lambdaImp-exp (ids bodies)
         (closure ids bodies env)]
+      [case-lambda-exp (idss bodiess)
+        (closure-list idss bodiess env)]
       [if-exp (ifpred ifdot)
         (if (eval-exp ifpred env) 
           (eval-exp ifdot env))]
@@ -48,6 +50,13 @@
                      (extend-env-recursively proc-names 
                                              idss bodiess 
                                              env))]
+      [define-exp (id val)
+        (if (contains-env env id)
+          (error 'eval-exp
+                 "~a is already in environment"
+                 id)
+          (add-global-environment (list id) 
+                                  (list (eval-exp val env))))]
       [else (eopl:error 'eval-exp "Bad abstract syntax: ~a" exp)])))
 
 ; evaluate the list of operands, putting results into a list
@@ -70,20 +79,45 @@
 (define apply-proc
   (lambda (proc-value args)
     (cases proc-val proc-value
-      [prim-proc (op) (apply-prim-proc op args)]
-      [closure (id body env) (cond [(symbol? id) (eval-helper body 
-                                                              (extend-env (list id) 
-                                                                          (list args) 
-                                                                          env))]
-                                   [((list-of symbol?) id) (eval-helper body 
-                                                                        (extend-env id 
-                                                                                    args 
-                                                                                    env))]
-                                   [(pair? id) (eval-helper body 
-                                                            (extend-env (car (imhelper id args)) 
-                                                                        (cadr (imhelper id args)) 
-                                                                        env))])]
-      
+      [prim-proc (op) 
+        (apply-prim-proc op args)]
+      [closure (id body env) 
+        (cond [(symbol? id) (eval-helper body 
+                                        (extend-env (list id) 
+                                                    (list args) 
+                                                    env))]
+              [((list-of symbol?) id) 
+                (eval-helper body 
+                            (extend-env id args env))]
+              [(pair? id) (eval-helper body 
+                                       (extend-env (car (imhelper id args)) 
+                                                   (cadr (imhelper id args)) 
+                                                   env))])]
+      [closure-list (idss bodiess env)
+        (let closure-helper ([idss idss]
+                             [bodiess bodiess])
+          (cond [(null? idss) (error 'apply-proc
+                                     "Incorrect argument format ~s"
+                                     proc-value)]
+                [(list? (car idss)) (if (eqv? (length args) 
+                                              (length (car idss)))
+                                      (apply-proc (closure (car idss) 
+                                                           (car bodiess) 
+                                                           env)
+                                                  args)
+                                      (closure-helper (cdr idss) (cdr bodiess)))]
+                [(pair? (car idss)) (if (null? args)
+                                        (closure-helper (cdr idss) (cdr bodiess))
+                                        (apply-proc (closure (car idss) 
+                                                             (car bodiess) 
+                                                             env)
+                                                    args))]
+                [(symbol? (car idss)) (apply-proc (closure (car idss)
+                                                           (car bodiess)
+                                                           env)
+                                                  args)]
+                [else (closure-helper (cdr idss) (cdr bodiess))]))]  
+  
 			; You will add other cases
       [else (error 'apply-proc
                    "Attempt to apply bad procedure: ~s" 
@@ -106,12 +140,14 @@
                             map list apply memq void quotient append list-tail;A14
                             display newline))
 
+(define global-env
+  (empty-env))
+
 (define init-env         ; for now, our initial global environment only contains 
   (extend-env *prim-proc-names*           ; procedure names.  Recall that an environment associates
               (map prim-proc                        ;  a value (not an expression) with an identifier.
                    *prim-proc-names*)
-              (empty-env)))
-
+              init-global-env))
 ; Usually an interpreter must define each 
 ; built-in procedure individually.  We are "cheating" a little bit.
 
@@ -190,8 +226,8 @@
       [(quotient) (quotient (1st args) (2nd args))]
       [(append) (append (1st args) (2nd args))]
       [else (error 'apply-prim-proc 
-            "Bad primitive procedure name: ~s" 
-            prim-op)])))
+                   "Bad primitive procedure name: ~s" 
+                   prim-op)])))
 
 (define rep      ; "read-eval-print" loop.
   (lambda ()

@@ -32,6 +32,10 @@
                     bodiess)
           env)))))
 
+(define add-global-environment
+  (lambda (syms vals)
+    (set! global-env (extend-env syms vals global-env))))
+
 (define list-set
   (lambda (ls pos val)
     (if (zero? pos)
@@ -42,10 +46,32 @@
   (lambda (env sym) 
     (cases environment env 
       [empty-env-record ()      
-        (eopl:error 'env "variable ~s not found." sym)]
+        (apply-env-c global-env sym)]
       [extended-env-record (syms vals env)
-	(let ((pos (list-find-position sym syms)))
+	      (let ([pos (list-find-position sym syms)])
       	  (if (number? pos)
-	      (list-ref vals pos)
-	      (apply-env env sym)))])))
+	          (list-ref vals pos)
+	          (apply-env env sym)))])))
+
+(define apply-env-c
+  (lambda (env sym) 
+    (cases environment env 
+      [empty-env-record ()      
+        (error 'env "variable ~s not found" sym)]
+      [extended-env-record (syms vals env)
+	      (let ([pos (list-find-position sym syms)])
+      	  (if (number? pos)
+	          (list-ref vals pos)
+	          (apply-env env sym)))])))
+
+(define contains-env
+  (lambda (env sym) 
+    (cases environment env 
+      [empty-env-record ()      
+        #f]
+      [extended-env-record (syms vals env)
+	      (let ((pos (list-find-position sym syms)))
+      	  (if (number? pos)
+	        #t
+	        (contains-env env sym)))])))
 

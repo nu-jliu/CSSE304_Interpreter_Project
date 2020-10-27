@@ -35,9 +35,18 @@
   [prim-proc
     (name symbol?)]
   [closure
-    (ids (lambda (x) (or (symbol? x) (pair? x) ((list-of symbol?) x))))
+    (ids (lambda (x) (or (symbol? x) 
+                         (pair? x) 
+                         ((list-of symbol?) x))))
     (bodies (lambda (x) (or ((list-of expression?) x)
                             (expression? x))))
+    (env environment?)]
+  [closure-list 
+    (idss (list-of (lambda (x) (or (symbol? x) 
+                                   (pair? x) 
+                                   ((list-of symbol?) x)))))
+    (bodiess (list-of (lambda (x) (or ((list-of expression?) x)
+                                      (expression? x)))))
     (env environment?)])
 
 
@@ -95,13 +104,22 @@
     (id expression?)
     (cases (list-of list?))
     (evals (list-of (list-of expression?)))]
+  [case-lambda-exp
+    (idss (list-of (lambda (x) (or (symbol? x)
+                                   (and (pair? x)
+                                        (symbol? (car x)))
+                                   ((list-of symbol?) x)))))
+    (bodiess (list-of (list-of expression?)))]
   [or-exp
     (body (list-of expression?))]
   [and-exp
     (body (list-of expression?))]
   [while-exp
     (test-exp expression?)
-    (bodies (list-of expression?))])
+    (bodies (list-of expression?))]
+  [define-exp
+    (id symbol?)
+    (val expression?)])
  
 (define-datatype lit-type lit-type?
   [an-number
