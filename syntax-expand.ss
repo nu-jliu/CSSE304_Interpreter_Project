@@ -86,7 +86,8 @@
                                                             (list (app-exp (var-exp 'void) '())) init)
                                                         (list (while-exp test
                                                               (append bodies (if (null? update)
-                                                                      (list (app-exp (var-exp 'void) '())))))))))]
+                                                                      (list (app-exp (var-exp 'void) '()))
+                                                                          update)))))))]
       [namedlet-exp (name vars args body)
         (syntax-expand (letrec-exp (list name)
                                    (list vars)
