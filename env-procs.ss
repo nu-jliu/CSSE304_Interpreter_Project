@@ -62,7 +62,7 @@
 	      (let ([pos (list-find-position sym syms)])
       	  (if (number? pos)
 	          (list-ref vals pos)
-	          (apply-env env sym)))])))
+	          (apply-env-c env sym)))])))
 
 (define contains-env
   (lambda (env sym) 
