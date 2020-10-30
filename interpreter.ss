@@ -50,13 +50,17 @@
                      (extend-env-recursively proc-names 
                                              idss bodiess 
                                              env))]
+      [set!-exp (id exp)
+        (cell-set! 
+                   (apply-env-ref env id)
+                    (eval-exp exp env))]
       [define-exp (id val)
-        (if (contains-env env id)
-          (error 'eval-exp
-                 "~a is already in environment"
-                 id)
+        ;(if (contains-env env id)
+          ; (error 'eval-exp
+          ;        "~a is already in environment"
+          ;        id)
           (add-global-environment (list id) 
-                                  (list (eval-exp val env))))]
+                                  (list (eval-exp val env)))]
       [else (eopl:error 'eval-exp "Bad abstract syntax: ~a" exp)])))
 
 ; evaluate the list of operands, putting results into a list
@@ -141,13 +145,20 @@
                             display newline))
 
 (define global-env
-  (empty-env))
-
-(define init-env         ; for now, our initial global environment only contains 
   (extend-env *prim-proc-names*           ; procedure names.  Recall that an environment associates
               (map prim-proc                        ;  a value (not an expression) with an identifier.
                    *prim-proc-names*)
               (empty-env)))
+
+(define reset-global-env
+  (lambda ()
+  (set! global-env (extend-env *prim-proc-names*           ; procedure names.  Recall that an environment associates
+              (map prim-proc                        ;  a value (not an expression) with an identifier.
+                   *prim-proc-names*)
+              (empty-env)))))
+
+(define init-env         ; for now, our initial global environment only contains 
+ (empty-env))
 ; Usually an interpreter must define each 
 ; built-in procedure individually.  We are "cheating" a little bit.
 

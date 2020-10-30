@@ -7,7 +7,7 @@
 
 (define extend-env
   (lambda (syms vals env)
-    (extended-env-record syms vals env)))
+    (extended-env-record syms (map cell vals) env)))
 
 (define list-find-position
   (lambda (sym los)
@@ -19,14 +19,14 @@
 (define extend-env-recursively
   (lambda  (proc-names idss bodiess old-env)
     (let ([len (length proc-names)])
-      (let ([vec (make-list len 0)])
+      (let ([vec (make-list len (cell 0))])
         (let ([env (extended-env-record proc-names
-                                        vec
+                                         vec
                                         old-env)])
           (for-each (lambda (pos ids bodies)
                       (list-set vec
                                 pos
-                                (closure ids bodies env)))
+                                 (cell (closure ids bodies env))))
                     (iota len)
                     idss
                     bodiess)
@@ -42,7 +42,7 @@
       (set-car! ls val)
       (list-set (cdr ls) (- pos 1) val))))
 
-(define apply-env
+(define apply-env-ref ;return the reference
   (lambda (env sym) 
     (cases environment env 
       [empty-env-record ()      
@@ -51,7 +51,11 @@
 	      (let ([pos (list-find-position sym syms)])
       	  (if (number? pos)
 	          (list-ref vals pos)
-	          (apply-env env sym)))])))
+	          (apply-env-ref env sym)))])))
+
+(define apply-env 
+  (lambda (env var)
+    (cell-ref (apply-env-ref env var))));take the value from the reference 
 
 (define apply-env-c
   (lambda (env sym) 

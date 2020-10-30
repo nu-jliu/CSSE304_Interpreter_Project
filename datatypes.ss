@@ -25,7 +25,7 @@
   (empty-env-record)
   (extended-env-record
     (syms (list-of symbol?))
-    (vals (list-of scheme-value?))
+    (vals (list-of cell?))
     (env environment?)))
 
 ; datatype for procedures.  At first there is only one
@@ -135,3 +135,9 @@
     (b boolean?)]
   [an-char
     (c char?)])
+
+
+(define cell box)
+(define cell? box?)
+(define cell-ref unbox)
+(define cell-set! set-box!)
