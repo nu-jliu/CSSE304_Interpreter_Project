@@ -24,7 +24,7 @@
 (define-datatype environment environment?
   (empty-env-record)
   (extended-env-record
-    (syms (list-of symbol?))
+    (syms (list-of (lambda (y) (or (symbol? y) (expression? y)))))
     (vals (list-of cell?))
     (env environment?)))
 
@@ -54,10 +54,10 @@
   [var-exp
    (id symbol?)]
   [lambda-exp
-   (ids (lambda (x ) (or (list-of symbol?) (list-of expression?))))
+   (ids (list-of (lambda (y) (or (symbol? y) (expression? y)))))
    (bodies (lambda (x) (or ((list-of expression?) x) 
                            (expression? x))))]
-   [ref-exp
+  [ref-exp
     (id symbol?)]
   [lambda-x-exp
     (id symbol?)
