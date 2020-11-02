@@ -57,6 +57,29 @@
   (lambda (env var)
     (cell-ref (apply-env-ref env var))));take the value from the reference 
 
+(define apply-lex-env 
+  (lambda (env lex-var)
+    (cases lexical lex-var
+    [free-lexical (sym) (apply-env global-env sym)]
+    [bound-lexical (dep pos) (get-val-by-address dep pos env)])
+    )
+  )
+
+(define get-val-by-address
+  (lambda (dep pos env)
+
+        (cases environment env
+        [empty-env-record () (eopl:error 'get-val-by-address 
+                                                                  "invalid lexical address ~s" 
+                                                                  env)]
+        [extended-env-record (syms vals envv)
+        (if (= dep 0)
+            (cell-ref (list-ref vals pos))
+        (get-val-by-address (sub1 dep) pos envv))]
+        
+        
+        )))
+
 (define apply-env-c
   (lambda (env sym) 
     (cases environment env 

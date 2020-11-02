@@ -13,13 +13,13 @@
         (begin
           (eval-exp (car body) env)
           (eval-helper (cdr body) env)))))
-    
+
 (define eval-exp
   (lambda (exp env)
     (cases expression exp
       [lit-exp (datum) datum]
       [var-exp (id) 
-        (apply-env env id)]
+        (apply-lex-env env id)]
       [lambda-exp (id body)
         (closure id body env)]
       [lambda-x-exp (ids bodies)
@@ -93,10 +93,17 @@
               [((list-of symbol?) id) 
                 (eval-helper body 
                             (extend-env id args env))]
-              [(pair? id) (eval-helper body 
+                            
+              ; [(pair? id) (eval-helper body 
+              ;                          (extend-env (car (imhelper id args)) 
+              ;                                      (cadr (imhelper id args)) 
+              ;                                      env))])]
+
+               [(pair? id) (eval-helper body 
                                        (extend-env (car (imhelper id args)) 
                                                    (cadr (imhelper id args)) 
                                                    env))])]
+
       [closure-list (idss bodiess env)
         (let closure-helper ([idss idss]
                              [bodiess bodiess])
@@ -127,7 +134,7 @@
                    "Attempt to apply bad procedure: ~s" 
                     proc-value)])))
 
-(define imhelper
+(define imhelper ;improper-list-closure helper
     (lambda (ids args)
       (if (symbol? ids)
         (list (list ids) (list args))
@@ -250,4 +257,4 @@
       (rep))))  ; tail-recursive, so stack doesn't grow.
 
 (define eval-one-exp
-  (lambda (x) (top-level-eval (syntax-expand (parse-exp x)))))
+  (lambda (x) (top-level-eval (lexical-address (syntax-expand (parse-exp x))))))

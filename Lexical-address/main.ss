@@ -15,7 +15,8 @@
     (load "env-procs.ss")
     (load "continuations.ss")
     (load "parse-procs.ss")
-    (load "interpreter.ss")))
+    (load "interpreter.ss")
+    (load "lexical-address.ss")))
 
 (load-all)
 

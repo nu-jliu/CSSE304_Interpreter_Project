@@ -2,18 +2,18 @@
 ;; Parsed expression datatype.  You will probably want to replace this
 ;; with your expression datatype from A11b.
 
-(define-datatype expression expression?
-  [var-exp        ; variable references
-   (id symbol?)]
-  [lit-exp        ; "Normal" data.  Did I leave out any types?
-    (datum
-      (lambda (x) 
-        (ormap (lambda (pred) 
-                 (pred x))
-               (list number? vector? boolean? symbol? string? pair? null?))))]
-  [app-exp        ; applications
-    (rator expression?)
-    (rands (list-of expression?))])
+; (define-datatype expression expression?
+;   [var-exp        ; variable references
+;    (id symbol?)]
+;   [lit-exp        ; "Normal" data.  Did I leave out any types?
+;     (datum
+;       (lambda (x) 
+;         (ormap (lambda (pred) 
+;                  (pred x))
+;                (list number? vector? boolean? symbol? string? pair? null?))))]
+;   [app-exp        ; applications
+;     (rator expression?)
+;     (rands (list-of expression?))])
 
  	
 ;; environment type definitions
@@ -48,11 +48,16 @@
     (bodiess (list-of (lambda (x) (or ((list-of expression?) x)
                                       (expression? x)))))
     (env environment?)])
-
+(define-datatype lexical lexical?
+  [free-lexical (sym symbol?)]
+  [bound-lexical  (dep number?)
+                  (pos number?)]
+  )
 
 (define-datatype expression expression?
   [var-exp
-   (id symbol?)]
+   (id (lambda (x) (or (symbol? x) 
+                           (lexical? x))))]
   [lambda-exp
    (ids (list-of symbol?))
    (bodies (lambda (x) (or ((list-of expression?) x) 
