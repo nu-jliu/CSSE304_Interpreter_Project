@@ -50,7 +50,10 @@
       [extended-env-record (syms vals env)
 	      (let ([pos (list-find-position sym syms)])
       	  (if (number? pos)
-	          (list-ref vals pos)
+	          (let ([ref-item (list-ref vals pos)])
+                  (if (equal? sym (cell-ref ref-item))
+                      (apply-env-ref env sym)
+                      ref-item))
 	          (apply-env-ref env sym)))])))
 
 (define apply-env 

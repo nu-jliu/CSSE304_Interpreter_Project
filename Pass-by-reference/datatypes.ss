@@ -28,6 +28,13 @@
     (vals (list-of cell?))
     (env environment?)))
 
+(define get-eenv
+  (lambda (env)
+   (cases environment env
+   [empty-env-record () env]
+   [extended-env-record (syms vals eenv) eenv]))
+   )
+
 ; datatype for procedures.  At first there is only one
 ; kind of procedure, but more kinds will be added later.
 (define is-all-symbol?

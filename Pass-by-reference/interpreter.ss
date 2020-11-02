@@ -19,7 +19,11 @@
     (cases expression exp
       [lit-exp (datum) datum]
       [var-exp (id) 
-        (apply-env-ref env id)]
+        (let loop ([result (apply-env env id)])
+              (if (symbol? result) (loop (apply-env env result))
+                                    result
+              ))        
+        ]
       [lambda-exp (id body)
         (closure id body env)];;;;20:59 dp
       [lambda-x-exp (ids bodies)
@@ -42,7 +46,7 @@
                 ([args (app-exp-helper proc-value rands env)])
               ; ([args (eval-rands rands env)])
 
-          (apply-proc proc-value args))
+          (apply-proc proc-value args env))
 
         )]
    
@@ -114,6 +118,9 @@
 
    (define apply-ref-helper
                   (lambda (id args)
+                    (if (and (null? id) (null? args))
+                              '(() ())
+
                       (apply map list (apply map (lambda (x y) 
                     (if (symbol? x)
                         (list x y)
@@ -121,6 +128,7 @@
                       ))
                      (list id args) )
                    )
+                    )
                       ))
 
 
@@ -129,7 +137,7 @@
 ;  User-defined procedures will be added later.
 
 (define apply-proc
-  (lambda (proc-value args)
+  (lambda (proc-value args proc-env)
     (cases proc-val proc-value
       [prim-proc (op) 
         (apply-prim-proc op (map (lambda (x) (if (cell? x) (cell-ref x)
@@ -158,7 +166,7 @@
                   (extend-env 
                     (car (apply-ref-helper id args))
                               (cadr (apply-ref-helper id args))
-                              env))]
+                              proc-env))]
                             ;(extend-env id args env))]
 
              
@@ -274,7 +282,7 @@
       [(map)  (apply map 
                     (lambda (x) (apply-proc (1st args) (list x)))
                      (cdr args))];A14
-      [(apply) (apply apply-proc (1st args) (cdr args))];A14
+      [(apply) (apply apply-proc (1st args) (cdr args) init-env)];A14
       [(assq) (assq (1st args) (2nd args))];
       [(eq?) (eq? (1st args) (2nd args))];
       [(eqv?) (eqv? (1st args) (2nd args))];
