@@ -37,9 +37,15 @@
           (eval-exp ifdof env))]
       [app-exp (rator rands)
         (let ([proc-value ((lambda (x) (if (cell? x) (cell-ref x)
-                                                    x)) (eval-exp rator env))]
-              [args (eval-rands rands env)])
-          (apply-proc proc-value args))]
+                                                    x)) (eval-exp rator env))])
+          (let
+                ([args (app-exp-helper proc-value rands env)])
+              ; ([args (eval-rands rands env)])
+
+          (apply-proc proc-value args))
+
+        )]
+   
       [while-exp (test-exp bodies)
         (let loop ([t test-exp])
           (if (eval-exp t env)
@@ -52,9 +58,13 @@
                                              idss bodiess 
                                              env))]
       [set!-exp (id exp)
-        (cell-set! 
-                   (apply-env-ref env id)
-                    (eval-exp exp env))]
+        
+         (let ([e1 (apply-env-ref env id)])
+                   (if (symbol? (cell-ref e1)) 
+                       (eval-exp (set!-exp (cell-ref e1) exp) env)
+                      (cell-set! e1  (eval-exp exp env))))
+                      ]
+                   
       [ref-exp (id) id ]
       [define-exp (id val)
         ;(if (contains-env env id)
@@ -65,6 +75,26 @@
                                   (list (eval-exp val env)))]
       [else (eopl:error 'eval-exp "Bad abstract syntax: ~a" exp)])))
 
+     (define app-exp-helper
+          (lambda (proc rands env)
+            (cases proc-val proc
+            [prim-proc (name) 
+              (eval-rands rands env)]
+            [closure (id body envv)
+              (let ([ref-check (map expression? id)])
+              (apply map (lambda (x y)
+                            (if x (app-exp-helper2 y env)
+                                  (eval-exp y env))) (list ref-check rands))
+              )]
+            [closure-list (idss bodiess envv)
+              (eval-rands rands env)
+            ])))
+        (define app-exp-helper2
+          (lambda (exp env)
+            (cases expression exp
+              [var-exp (var) var]
+              [else 
+               (eval-exp exp env)])))
 ; evaluate the list of operands, putting results into a list
 
 (define eval-bodies
@@ -87,7 +117,7 @@
                       (apply map list (apply map (lambda (x y) 
                     (if (symbol? x)
                         (list x y)
-                        (list (eval-exp x init-env) (cell y))
+                        (list (eval-exp x init-env) y)
                       ))
                      (list id args) )
                    )

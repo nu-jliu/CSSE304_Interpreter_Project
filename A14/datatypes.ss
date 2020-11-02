@@ -24,62 +24,33 @@
 (define-datatype environment environment?
   (empty-env-record)
   (extended-env-record
-    (syms (list-of (lambda (y) (or (symbol? y) (expression? y)))))
-    (vals (list-of cell?))
+    (syms (list-of symbol?))
+    (vals (list-of scheme-value?))
     (env environment?)))
 
 ; datatype for procedures.  At first there is only one
 ; kind of procedure, but more kinds will be added later.
-(define is-all-symbol?
-
-     (lambda (pairr)
-
-       (cond [(pair? pairr) (if (symbol? (car pairr))
-
-                               (is-all-symbol? (cdr pairr))
-
-                               #f)]
-
-         [else (symbol? pairr)])))
 
 (define-datatype proc-val proc-val?
   [prim-proc
     (name symbol?)]
   [closure
-    (ids (lambda (x) (or (symbol? x) 
-                         (and (pair? x) (is-all-symbol? x))
-                        ;  ((list-of symbol?) x))))
-                         ((list-of (lambda (y) (or (symbol? y) (expression? y)))) x)
-    )))
+    (ids (lambda (x) (or (symbol? x) (pair? x) ((list-of symbol?) x))))
     (bodies (lambda (x) (or ((list-of expression?) x)
                             (expression? x))))
     (env environment?)]
-  [closure-list 
-    (idss (list-of (lambda (x) (or (symbol? x) 
-                                   (pair? x) 
-                                   ((list-of symbol?) x)))))
-    (bodiess (list-of (lambda (x) (or ((list-of expression?) x)
-                                      (expression? x)))))
-    (env environment?)]
-    )
+  )
 
 
 (define-datatype expression expression?
   [var-exp
    (id symbol?)]
   [lambda-exp
-   (ids (list-of (lambda (y) (or (symbol? y) (expression? y)))))
+   (ids (list-of symbol?))
    (bodies (lambda (x) (or ((list-of expression?) x) 
                            (expression? x))))]
-  [ref-exp
-    (id symbol?)]
   [lambda-x-exp
     (id symbol?)
-    (bodies (list-of expression?))]
-  [for-exp 
-    (init (list-of expression?))
-    (test expression?)
-    (update (list-of expression?))
     (bodies (list-of expression?))]
   [lambdaImp-exp 
     (ids pair?)
@@ -101,22 +72,22 @@
     (ifdot  expression?)]
   [namedlet-exp
     (name symbol?)
+    ;(var-list (list-of (list-of expression?)))
+    ;(body (list-of expression?))
     (vars (list-of symbol?))
     (args (list-of expression?))
     (body (list-of expression?))]
   [let-exp
+    ;(var-list (list-of (list-of expression?)))
+    ;(body (list-of expression?))
     (vars (list-of symbol?))
     (args (list-of expression?))
     (body (list-of expression?))]
   [let*-exp
+ ;   (var-list (list-of (list-of expression?)))
     (vars (list-of symbol?))
     (args (list-of expression?))
     (body (list-of expression?))]
-  [letrec-exp
-    (proc-names (list-of symbol?))
-    (idss (list-of (list-of symbol?)))
-    (bodiess (list-of (list-of expression?)))
-    (letrec-bodies (list-of expression?))]
   [begin-exp 
     (body (list-of expression?))]
   [cond-exp 
@@ -125,22 +96,16 @@
     (id expression?)
     (cases (list-of list?))
     (evals (list-of (list-of expression?)))]
-  [case-lambda-exp
-    (idss (list-of (lambda (x) (or (symbol? x)
-                                   (and (pair? x)
-                                        (symbol? (car x)))
-                                   ((list-of symbol?) x)))))
-    (bodiess (list-of (list-of expression?)))]
   [or-exp
     (body (list-of expression?))]
   [and-exp
     (body (list-of expression?))]
+  [letrec-exp
+    (var-list (list-of (list-of expression?)))
+    (body (list-of expression?))]
   [while-exp
     (test-exp expression?)
-    (bodies (list-of expression?))]
-  [define-exp
-    (id symbol?)
-    (val expression?)])
+    (bodies (list-of expression?))])
  
 (define-datatype lit-type lit-type?
   [an-number
@@ -151,9 +116,3 @@
     (b boolean?)]
   [an-char
     (c char?)])
-
-
-(define cell box)
-(define cell? box?)
-(define cell-ref unbox)
-(define cell-set! set-box!)
