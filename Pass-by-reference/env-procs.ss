@@ -21,12 +21,12 @@
     (let ([len (length proc-names)])
       (let ([vec (make-list len (cell 0))])
         (let ([env (extended-env-record proc-names
-                                         vec
+                                        vec
                                         old-env)])
           (for-each (lambda (pos ids bodies)
                       (list-set vec
                                 pos
-                                 (cell (closure ids bodies env))))
+                                (cell (closure ids bodies env))))
                     (iota len)
                     idss
                     bodiess)
