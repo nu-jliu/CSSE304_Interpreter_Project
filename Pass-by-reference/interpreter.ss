@@ -20,12 +20,11 @@
       [lit-exp (datum) datum]
       [var-exp (id) 
         (let loop ([result (apply-env env id)])
-              (if (symbol? result) (loop (apply-env env result))
-                                    result
-              ))        
-        ]
+          (if (symbol? result) 
+            (loop (apply-env env result))
+            result))]
       [lambda-exp (id body)
-        (closure id body env)];;;;20:59 dp
+        (closure id body env)]
       [lambda-x-exp (ids bodies)
         (closure ids bodies env)]
       [lambdaImp-exp (ids bodies)
@@ -40,16 +39,12 @@
           (eval-exp ifdot env) 
           (eval-exp ifdof env))]
       [app-exp (rator rands)
-        (let ([proc-value ((lambda (x) (if (cell? x) (cell-ref x)
-                                                    x)) (eval-exp rator env))])
-          (let
-                ([args (app-exp-helper proc-value rands env)])
-              ; ([args (eval-rands rands env)])
-
-          (apply-proc proc-value args env))
-
-        )]
-   
+        (let ([proc-value ((lambda (x) 
+                             (if (cell? x) 
+                               (cell-ref x)
+                               x)) (eval-exp rator env))])
+          (let ([args (app-exp-helper proc-value rands env)])
+            (apply-proc proc-value args env)))]
       [while-exp (test-exp bodies)
         (let loop ([t test-exp])
           (if (eval-exp t env)
@@ -62,43 +57,42 @@
                                              idss bodiess 
                                              env))]
       [set!-exp (id exp)
-        
-         (let ([e1 (apply-env-ref env id)])
-                   (if (symbol? (cell-ref e1)) 
-                       (eval-exp (set!-exp (cell-ref e1) exp) env)
-                      (cell-set! e1  (eval-exp exp env))))
-                      ]
-                   
-      [ref-exp (id) id ]
+        (let ([e1 (apply-env-ref env id)])
+          (if (symbol? (cell-ref e1)) 
+                (eval-exp (set!-exp (cell-ref e1) exp) env)
+                (cell-set! e1  (eval-exp exp env))))]
+      [ref-exp (id) id]
       [define-exp (id val)
         ;(if (contains-env env id)
           ; (error 'eval-exp
           ;        "~a is already in environment"
           ;        id)
-          (add-global-environment (list id) 
-                                  (list (eval-exp val env)))]
+        (add-global-environment (list id) 
+                                (list (eval-exp val env)))]
       [else (eopl:error 'eval-exp "Bad abstract syntax: ~a" exp)])))
 
-     (define app-exp-helper
-          (lambda (proc rands env)
-            (cases proc-val proc
-            [prim-proc (name) 
-              (eval-rands rands env)]
-            [closure (id body envv)
-              (let ([ref-check (map expression? id)])
-              (apply map (lambda (x y)
-                            (if x (app-exp-helper2 y env)
-                                  (eval-exp y env))) (list ref-check rands))
-              )]
-            [closure-list (idss bodiess envv)
-              (eval-rands rands env)
-            ])))
-        (define app-exp-helper2
-          (lambda (exp env)
-            (cases expression exp
-              [var-exp (var) var]
-              [else 
-               (eval-exp exp env)])))
+(define app-exp-helper
+  (lambda (proc rands env)
+    (cases proc-val proc
+      [prim-proc (name) 
+        (eval-rands rands env)]
+      [closure (id body envv)
+        (let ([ref-check (map expression? id)])
+          (apply map (lambda (x y)
+                       (if x 
+                         (app-exp-helper2 y env)
+                         (eval-exp y env))) 
+                     (list ref-check rands)))]
+      [closure-list (idss bodiess envv)
+        (eval-rands rands env)])))
+        
+(define app-exp-helper2
+  (lambda (exp env)
+    (cases expression exp
+      [var-exp (var) 
+        var]
+      [else (eval-exp exp 
+        env)])))
 ; evaluate the list of operands, putting results into a list
 
 (define eval-bodies
@@ -106,31 +100,25 @@
     (if (null? (cdr bodies))
       (eval-exp (car bodies) env)
       (begin (eval-exp (car bodies) env)
-        (eval-bodies (cdr bodies) env)))))
+             (eval-bodies (cdr bodies) env)))))
 
 (define eval-rands
   (lambda (rands env)
-    (map (lambda (x) (eval-exp x env)) rands)))
+    (map (lambda (x) (eval-exp x env)) 
+         rands)))
 
-
-
-;;
-
-   (define apply-ref-helper
-                  (lambda (id args)
-                    (if (and (null? id) (null? args))
-                              '(() ())
-
-                      (apply map list (apply map (lambda (x y) 
-                    (if (symbol? x)
-                        (list x y)
-                        (list (eval-exp x init-env) y)
-                      ))
-                     (list id args) )
-                   )
-                    )
-                      ))
-
+(define apply-ref-helper
+  (lambda (id args)
+    (if (and (null? id) 
+             (null? args))
+      '(() ())
+      (apply map list 
+                 (apply map (lambda (x y) 
+                              (if (symbol? x)
+                                (list x y)
+                                (list (eval-exp x init-env) 
+                                      y)))
+                            (list id args))))))
 
 ;  Apply a procedure to its arguments.
 ;  At this point, we only have primitive procedures.  
@@ -140,39 +128,25 @@
   (lambda (proc-value args proc-env)
     (cases proc-val proc-value
       [prim-proc (op) 
-        (apply-prim-proc op (map (lambda (x) (if (cell? x) (cell-ref x)
-                                                            x)) args))
-        ]
+        (apply-prim-proc op 
+                         (map (lambda (x) 
+                                (if (cell? x) 
+                                  (cell-ref x)
+                                  x)) 
+                              args))]
       [closure (id body env) 
-        (cond 
-              ; [(symbol? id) (eval-helper body 
-              ;                           (extend-env (list id) 
-              ;                                       (list args) 
-              ;                                       env))] ;;change this one: add ref case
-
-              [(symbol? id) (eval-helper body  ;; lambda-x-exp
-                                        (extend-env (list id) 
-                                                    (list args) 
-                                                    env))]
-
-              ; [((list-of symbol?) id) ;; lambda-exp
-              ;   (eval-helper body 
-              ;               (extend-env id args env))]
-
-                [((list-of (lambda (y) (or (symbol? y) (expression? y)))) id) ;; lambda-exp
-
+        (cond [(symbol? id) 
+                (eval-helper body  ;; lambda-x-exp
+                             (extend-env (list id) 
+                                         (list args) 
+                                         env))]
+              [((list-of (lambda (y) 
+                           (or (symbol? y) 
+                               (expression? y)))) id) ;; lambda-exp
                 (eval-helper body 
-
-                  (extend-env 
-                    (car (apply-ref-helper id args))
-                              (cadr (apply-ref-helper id args))
-                              proc-env))]
-                            ;(extend-env id args env))]
-
-             
-
-
-
+                             (extend-env (car (apply-ref-helper id args))
+                                         (cadr (apply-ref-helper id args))
+                                         proc-env))]
               [(pair? id) (eval-helper body ;; lambdaImp-exp
                                        (extend-env (car (imhelper id args)) 
                                                    (cadr (imhelper id args)) 

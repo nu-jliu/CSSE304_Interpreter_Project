@@ -19,8 +19,7 @@
           [(pair? datum)
             (cond [(not (list? datum)) (eopl:error 'parse-exp 
                                                    "application ~s is not a proper list" 
-                                                   datum)]  
-                  
+                                                   datum)]
                   [(eqv? (1st datum) 'ref) (ref-exp (2nd datum)) ]
                   [(eqv? (1st datum) 'lambda)
                     (cond [(< (length datum) 3) (eopl:error 'parse-exp 
@@ -46,7 +45,8 @@
                                   datum)
                       (set!-exp (2nd datum) (parse-exp (3rd datum))))]
                   [(eqv? (1st datum) 'if)
-                    (cond [(or (< (length datum) 3) (> (length datum) 4))
+                    (cond [(or (< (length datum) 3) 
+                               (> (length datum) 4))
                             (eopl:error 'parse-exp 
                                         "bad input for if: ~s" 
                                         datum)]
@@ -162,4 +162,5 @@
      [var-exp (id) id]
      [lit-exp (num) num]
      [else #f])))
+
 (var-exp? (var-exp 'a))

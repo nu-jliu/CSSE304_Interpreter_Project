@@ -51,16 +51,15 @@
                                              idss bodiess 
                                              env))]
       [set!-exp (id exp)
-        (cell-set! 
-                   (apply-env-ref env id)
-                    (eval-exp exp env))]
+        (cell-set! (apply-env-ref env id)
+                   (eval-exp exp env))]
       [define-exp (id val)
         ;(if (contains-env env id)
           ; (error 'eval-exp
           ;        "~a is already in environment"
           ;        id)
-          (add-global-environment (list id) 
-                                  (list (eval-exp val env)))]
+        (add-global-environment (list id) 
+                                (list (eval-exp val env)))]
       [else (eopl:error 'eval-exp "Bad abstract syntax: ~a" exp)])))
 
 ; evaluate the list of operands, putting results into a list
@@ -90,16 +89,11 @@
                                         (extend-env (list id) 
                                                     (list args) 
                                                     env))]
-              [((list-of symbol?) id) 
-                (eval-helper body 
-                            (extend-env id args env))]
-                            
-              ; [(pair? id) (eval-helper body 
-              ;                          (extend-env (car (imhelper id args)) 
-              ;                                      (cadr (imhelper id args)) 
-              ;                                      env))])]
-
-               [(pair? id) (eval-helper body 
+              [((list-of symbol?) id) (eval-helper body 
+                                                   (extend-env id 
+                                                               args 
+                                                               env))]
+              [(pair? id) (eval-helper body 
                                        (extend-env (car (imhelper id args)) 
                                                    (cadr (imhelper id args)) 
                                                    env))])]
@@ -257,4 +251,5 @@
       (rep))))  ; tail-recursive, so stack doesn't grow.
 
 (define eval-one-exp
-  (lambda (x) (top-level-eval (lexical-address (syntax-expand (parse-exp x))))))
+  (lambda (x) 
+    (top-level-eval (lexical-address (syntax-expand (parse-exp x))))))

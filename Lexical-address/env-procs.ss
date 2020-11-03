@@ -21,12 +21,12 @@
     (let ([len (length proc-names)])
       (let ([vec (make-list len (cell 0))])
         (let ([env (extended-env-record proc-names
-                                         vec
+                                        vec
                                         old-env)])
           (for-each (lambda (pos ids bodies)
                       (list-set vec
                                 pos
-                                 (cell (closure ids bodies env))))
+                                (cell (closure ids bodies env))))
                     (iota len)
                     idss
                     bodiess)
@@ -60,25 +60,21 @@
 (define apply-lex-env 
   (lambda (env lex-var)
     (cases lexical lex-var
-    [free-lexical (sym) (apply-env global-env sym)]
-    [bound-lexical (dep pos) (get-val-by-address dep pos env)])
-    )
-  )
+    [free-lexical (sym) 
+      (apply-env global-env sym)]
+    [bound-lexical (dep pos) 
+      (get-val-by-address dep pos env)])))
 
 (define get-val-by-address
   (lambda (dep pos env)
-
-        (cases environment env
-        [empty-env-record () (eopl:error 'get-val-by-address 
-                                                                  "invalid lexical address ~s" 
-                                                                  env)]
-        [extended-env-record (syms vals envv)
+    (cases environment env
+      [empty-env-record () (eopl:error 'get-val-by-address 
+                                       "invalid lexical address ~s" 
+                                       env)]
+      [extended-env-record (syms vals envv)
         (if (= dep 0)
-            (cell-ref (list-ref vals pos))
-        (get-val-by-address (sub1 dep) pos envv))]
-        
-        
-        )))
+          (cell-ref (list-ref vals pos))
+          (get-val-by-address (sub1 dep) pos envv))])))
 
 (define apply-env-c
   (lambda (env sym) 

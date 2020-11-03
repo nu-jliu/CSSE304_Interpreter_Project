@@ -49,19 +49,22 @@
                                       (expression? x)))))
     (env environment?)])
 (define-datatype lexical lexical?
-  [free-lexical (sym symbol?)]
-  [bound-lexical  (dep number?)
-                  (pos number?)]
-  )
+  [free-lexical 
+    (sym symbol?)]
+  [bound-lexical  
+    (dep number?)
+    (pos number?)])
 
 (define-datatype expression expression?
   [var-exp
-   (id (lambda (x) (or (symbol? x) 
-                           (lexical? x))))]
+   (id (lambda (x) 
+         (or (symbol? x) 
+             (lexical? x))))]
   [lambda-exp
    (ids (list-of symbol?))
-   (bodies (lambda (x) (or ((list-of expression?) x) 
-                           (expression? x))))]
+   (bodies (lambda (x) 
+             (or ((list-of expression?) x) 
+                 (expression? x))))]
   [lambda-x-exp
     (id symbol?)
     (bodies (list-of expression?))]
@@ -83,11 +86,11 @@
     (val-exp expression?)]
   [ifelse-exp 
     (ifpred expression?)
-    (ifdot  expression?)
-    (ifdof  expression?)]
+    (ifdot expression?)
+    (ifdof expression?)]
   [if-exp
     (ifpred expression?)
-    (ifdot  expression?)]
+    (ifdot expression?)]
   [namedlet-exp
     (name symbol?)
     (vars (list-of symbol?))
@@ -115,10 +118,11 @@
     (cases (list-of list?))
     (evals (list-of (list-of expression?)))]
   [case-lambda-exp
-    (idss (list-of (lambda (x) (or (symbol? x)
-                                   (and (pair? x)
-                                        (symbol? (car x)))
-                                   ((list-of symbol?) x)))))
+    (idss (list-of (lambda (x) 
+                     (or (symbol? x)
+                         (and (pair? x)
+                              (symbol? (car x)))
+                         ((list-of symbol?) x)))))
     (bodiess (list-of (list-of expression?)))]
   [or-exp
     (body (list-of expression?))]
@@ -140,7 +144,6 @@
     (b boolean?)]
   [an-char
     (c char?)])
-
 
 (define cell box)
 (define cell? box?)
