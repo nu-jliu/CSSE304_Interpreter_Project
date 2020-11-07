@@ -47,8 +47,9 @@
                                    ((list-of symbol?) x)))))
     (bodiess (list-of (lambda (x) (or ((list-of expression?) x)
                                       (expression? x)))))
-    (env environment?)])
-
+    (env environment?)]
+  [k-proc 
+    (k continuation?)])
 
 (define-datatype expression expression?
   [var-exp
