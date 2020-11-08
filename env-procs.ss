@@ -7,7 +7,9 @@
 
 (define extend-env
   (lambda (syms vals env k)
-    (apply-k k (extended-env-record syms (map cell vals) env))))
+    (apply-k k (extended-env-record syms 
+                                    (map cell vals) 
+                                    env))))
 
 (define list-find-position
   (lambda (sym los)
@@ -38,8 +40,9 @@
     (extend-env syms
                 vals
                 global-env
-                (make-k (lambda (extended-env)
-                          (apply-k k (set! global-env extended-env)))))))
+                ;(make-k (lambda (extended-env)
+                ;          (apply-k k (set! global-env extended-env))))
+                (global-env-k k))))
 
 (define list-set
   (lambda (ls pos val)
@@ -62,8 +65,9 @@
   (lambda (env var k)
     (apply-env-ref env 
                    var
-                   (make-k (lambda (cell)
-                             (apply-k k (cell-ref cell)))))));take the value from the reference 
+                   ;(make-k (lambda (cell)
+                   ;          (apply-k k (cell-ref cell))))
+                   (app-env-k k))));take the value from the reference 
 
 (define apply-env-c
   (lambda (env sym k) 
