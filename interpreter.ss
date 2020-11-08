@@ -302,9 +302,6 @@
                         ;        (apply-proc (1st args) (list x) k))
                         ;      (cdr args)))
                         ;A14
-
-      
-
       [(apply) (apply (lambda (x) 
                         (apply-proc (1st args) 
                                     x 
@@ -324,12 +321,12 @@
       [(vector->list) (apply-k k (vector->list (1st args)))];
       [(vector) (apply-k k (apply vector args))]
       [(make-vector) (apply-k k (if (not (number? (1st args)))
-                         (eopl:error 'apply-prim-proc 
-                                     "Incorrect type of 1st argument: ~s" 
-                                     prim-op)
-                         (if (null? (cdr args))
-                           (make-vector (1st args))
-                           (make-vector (1st args) (2nd args)))))]
+                                  (eopl:error 'apply-prim-proc 
+                                              "Incorrect type of 1st argument: ~s" 
+                                              prim-op)
+                                  (if (null? (cdr args))
+                                    (make-vector (1st args))
+                                    (make-vector (1st args) (2nd args)))))]
       [(vector-ref) (apply-k k (vector-ref (1st args) (2nd args)))];
       [(vector?) (apply-k k (vector? (1st args)))];
       [(number?) (apply-k k (number? (1st args)))];
@@ -346,9 +343,10 @@
       [(call/cc) (apply-proc (car args)
                              (list (k-proc k))
                              k)]
-      [(exit-list) (apply-prim-proc 'list
-                                    args
-                                    (init-k))]
+      [(exit-list) ;(apply-prim-proc 'list
+                   ;                 args
+                   ;                 (init-k))
+                   args]
       [else (error 'apply-prim-proc 
                    "Bad primitive procedure name: ~s" 
                    prim-op)])))
