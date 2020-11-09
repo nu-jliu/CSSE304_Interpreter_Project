@@ -96,14 +96,16 @@
 ; evaluate the list of operands, putting results into a list
 (define while-loop
   (lambda (test-exp bodies env k)
-    (eval-exp test-exp env (while-k test-exp bodies env k))))
+    (eval-exp test-exp 
+              env 
+              (while-k test-exp bodies env k))))
 
-(define eval-bodies
-  (lambda (bodies env)
-    (if (null? (cdr bodies))
-      (eval-exp (car bodies) env)
-      (begin (eval-exp (car bodies) env)
-        (eval-bodies (cdr bodies) env)))))
+;(define eval-bodies
+;  (lambda (bodies env)
+;    (if (null? (cdr bodies))
+;      (eval-exp (car bodies) env)
+;      (begin (eval-exp (car bodies) env)
+;        (eval-bodies (cdr bodies) env)))))
 
 (define eval-bodies
   (lambda (bodies env k)

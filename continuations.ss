@@ -76,12 +76,15 @@
           (eval-exp ifdof env k))]
       [while-k (test bodies env k)
         (if val
-        (eval-bodies bodies env (while-bodies-k test bodies env k))
-        (apply-k k (void)))
-      ]
+          (eval-bodies bodies 
+                       env 
+                       (while-bodies-k test 
+                                       bodies 
+                                       env 
+                                       k))
+          (apply-k k (void)))]
       [while-bodies-k (test bodies env k)
-        (while-loop test bodies env k)
-      ]
+        (while-loop test bodies env k)]
       [if-k (ifdot env k)
         (if val
           (eval-exp ifdot env k)
