@@ -7,6 +7,16 @@
     (ifdof expression?)
     (env environment?)
     (k continuation?)]
+  [while-k
+    (test expression?)
+    (bodies (list-of expression?))
+    (env environment?)
+    (k continuation?)]
+   [while-bodies-k
+    (test expression?)
+    (bodies (list-of expression?))
+    (env environment?)
+    (k continuation?)]
   [if-k
     (ifdot expression?)
     (env environment?)
@@ -64,6 +74,14 @@
         (if val
           (eval-exp ifdot env k)
           (eval-exp ifdof env k))]
+      [while-k (test bodies env k)
+        (if val
+        (eval-bodies bodies env (while-bodies-k test bodies env k))
+        (apply-k k (void)))
+      ]
+      [while-bodies-k (test bodies env k)
+        (while-loop test bodies env k)
+      ]
       [if-k (ifdot env k)
         (if val
           (eval-exp ifdot env k)

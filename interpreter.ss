@@ -7,6 +7,7 @@
 
 ; eval-exp is the main component of the interpreter
 
+
     
 (define eval-exp
   (lambda (exp env k)
@@ -44,11 +45,16 @@
                   env
                   (rator-k rands env k))]
       [while-exp (test-exp bodies)
-        (let loop ([t test-exp])
-          (if (eval-exp t env)
-            (begin (eval-bodies bodies env) 
-                   (loop t))
-            (eval-exp (app-exp (var-exp 'void) '()) env)))] ; to be completed later (\^_^/)
+        ; (let loop ([t test-exp])
+        ;   (if (eval-exp t env)
+        ;     (begin (eval-bodies bodies env) 
+        ;            (loop t))
+        ;     (eval-exp (app-exp (var-exp 'void) '()) env)))
+
+       (while-loop test-exp bodies env k)
+            
+            
+            ] ; to be completed later (\^_^/)
       [letrec-exp (proc-names idss bodiess letrec-bodies)
         ;(eval-bodies letrec-bodies 
                      (extend-env-recursively proc-names 
@@ -88,6 +94,9 @@
       [else (eopl:error 'eval-exp "Bad abstract syntax: ~a" exp)])))
 
 ; evaluate the list of operands, putting results into a list
+(define while-loop
+  (lambda (test-exp bodies env k)
+    (eval-exp test-exp env (while-k test-exp bodies env k))))
 
 (define eval-bodies
   (lambda (bodies env)
