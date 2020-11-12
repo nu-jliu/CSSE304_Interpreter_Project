@@ -50,21 +50,17 @@
         ;     (begin (eval-bodies bodies env) 
         ;            (loop t))
         ;     (eval-exp (app-exp (var-exp 'void) '()) env)))
-
-       (while-loop test-exp bodies env k)
-            
-            
-            ] ; to be completed later (\^_^/)
+        (while-loop test-exp bodies env k)]
       [letrec-exp (proc-names idss bodiess letrec-bodies)
         ;(eval-bodies letrec-bodies 
-                     (extend-env-recursively proc-names 
-                                             idss bodiess 
-                                             env ;; non-CPSed code above ($_$)
-                                             ;(make-k (lambda (extended-env)
-                                             ;          (eval-bodies letrec-bodies
-                                             ;                       extended-env
-                                             ;                       k)))
-                                             (env-k letrec-bodies k))]
+        (extend-env-recursively proc-names 
+                                idss bodiess 
+                                env 
+                                ;(make-k (lambda (extended-env)
+                                ;          (eval-bodies letrec-bodies
+                                ;                       extended-env
+                                ;                       k)))
+                                (env-k letrec-bodies k))]
       [set!-exp (id val-exp)
         ;(cell-set! 
         ;           (apply-env-ref env id)
@@ -140,8 +136,8 @@
 
 ;(define map-cps
 ;  (lambda (proc-cps L K)
- ;   (if (null? L)
- ;     (apply-k K '())
+;    (if (null? L)
+;      (apply-k K '())
 ;      (map-cps proc-cps 
 ;               (cdr L) 
 ;               (make-k (lambda (cdr-L)
@@ -285,27 +281,27 @@
                             (eopl:error 'apply-prim-proc 
                                         "Incorrect number of arguments: ~s" 
                                         prim-op)))]
-      [(not) (apply-k k (not (1st args)))];
+      [(not) (apply-k k (not (1st args)))]
       [(<) (apply-k k (apply < args))]
       [(>) (apply-k k (apply > args))]
       [(<=) (apply-k k (apply <= args))]
       [(>=) (apply-k k (apply >= args))]
-      [(car) (apply-k k (car (1st args)))];
-      [(cdr) (apply-k k (cdr (1st args)))];
-      [(caar) (apply-k k (caar (1st args)))];
-      [(cadr) (apply-k k (cadr (1st args)))];
-      [(cdar) (apply-k k (cdar (1st args)))];
-      [(cddr) (apply-k k (cddr (1st args)))];
-      [(caaar) (apply-k k (caaar (1st args)))];
-      [(caadr) (apply-k k (caadr (1st args)))];
-      [(cadar) (apply-k k (cadar (1st args)))];
-      [(caddr) (apply-k k (caddr (1st args)))];
-      [(cdaar) (apply-k k (cdaar (1st args)))];
-      [(cdadr) (apply-k k (cdadr (1st args)))];
-      [(cddar) (apply-k k (cddar (1st args)))];
-      [(cdddr) (apply-k k (cdddr (1st args)))];
+      [(car) (apply-k k (car (1st args)))]
+      [(cdr) (apply-k k (cdr (1st args)))]
+      [(caar) (apply-k k (caar (1st args)))]
+      [(cadr) (apply-k k (cadr (1st args)))]
+      [(cdar) (apply-k k (cdar (1st args)))]
+      [(cddr) (apply-k k (cddr (1st args)))]
+      [(caaar) (apply-k k (caaar (1st args)))]
+      [(caadr) (apply-k k (caadr (1st args)))]
+      [(cadar) (apply-k k (cadar (1st args)))]
+      [(caddr) (apply-k k (caddr (1st args)))]
+      [(cdaar) (apply-k k (cdaar (1st args)))]
+      [(cdadr) (apply-k k (cdadr (1st args)))]
+      [(cddar) (apply-k k (cddar (1st args)))]
+      [(cdddr) (apply-k k (cdddr (1st args)))]
       [(list) (apply-k k args)]
-      [(null?) (apply-k k (null? (1st args)))];
+      [(null?) (apply-k k (null? (1st args)))]
       [(map) (map-proc-cps (cadr args)
                            (1st args)
                            k)] ;(apply map 
@@ -318,18 +314,18 @@
                                     x 
                                     k)) 
                       (cdr args))];A14
-      [(assq) (apply-k k (assq (1st args) (2nd args)))];
-      [(eq?) (apply-k k (eq? (1st args) (2nd args)))];
-      [(eqv?) (apply-k k (eqv? (1st args) (2nd args)))];
-      [(equal?) (apply-k k (equal? (1st args) (2nd args)))];
-      [(atom?) (apply-k k (atom? (1st args)))];
-      [(length) (apply-k k (length (1st args)))];
-      [(list->vector) (apply-k k (list->vector (1st args)))];
-      [(list?) (apply-k k (list? (1st args)))];
-      [(list-tail) (apply-k k (list-tail (1st args) (2nd args)))];
-      [(pair?) (apply-k k (pair? (1st args)))];
-      [(procedure?) (apply-k k (proc-val? (1st args)))];
-      [(vector->list) (apply-k k (vector->list (1st args)))];
+      [(assq) (apply-k k (assq (1st args) (2nd args)))]
+      [(eq?) (apply-k k (eq? (1st args) (2nd args)))]
+      [(eqv?) (apply-k k (eqv? (1st args) (2nd args)))]
+      [(equal?) (apply-k k (equal? (1st args) (2nd args)))]
+      [(atom?) (apply-k k (atom? (1st args)))]
+      [(length) (apply-k k (length (1st args)))]
+      [(list->vector) (apply-k k (list->vector (1st args)))]
+      [(list?) (apply-k k (list? (1st args)))]
+      [(list-tail) (apply-k k (list-tail (1st args) (2nd args)))]
+      [(pair?) (apply-k k (pair? (1st args)))]
+      [(procedure?) (apply-k k (proc-val? (1st args)))]
+      [(vector->list) (apply-k k (vector->list (1st args)))]
       [(vector) (apply-k k (apply vector args))]
       [(make-vector) (apply-k k (if (not (number? (1st args)))
                                   (eopl:error 'apply-prim-proc 
@@ -338,10 +334,10 @@
                                   (if (null? (cdr args))
                                     (make-vector (1st args))
                                     (make-vector (1st args) (2nd args)))))]
-      [(vector-ref) (apply-k k (vector-ref (1st args) (2nd args)))];
-      [(vector?) (apply-k k (vector? (1st args)))];
-      [(number?) (apply-k k (number? (1st args)))];
-      [(symbol?) (apply-k k (symbol? (1st args)))];
+      [(vector-ref) (apply-k k (vector-ref (1st args) (2nd args)))]
+      [(vector?) (apply-k k (vector? (1st args)))]
+      [(number?) (apply-k k (number? (1st args)))]
+      [(symbol?) (apply-k k (symbol? (1st args)))]
       [(set-car!) (apply-k k (set-car! (1st args) (2nd args)))]
       [(set-cdr!) (apply-k k (set-cdr! (1st args) (2nd args)))]
       [(vector-set!) (apply-k k (vector-set! (1st args) (2nd args) (3rd args)))]
@@ -366,10 +362,17 @@
   (lambda ()
     (display "--> ")
     ;; notice that we don't save changes to the environment...
-    (let ([answer (top-level-eval (parse-exp (read)))])
-      ;; TODO: are there answers that should display differently?
-      (eopl:pretty-print answer) (newline)
-      (rep))))  ; tail-recursive, so stack doesn't grow.
+    (let ([input (read)])
+      (if (equal? input '(exit))
+        (display "Shutting down Scheme interpreter.\n")
+        (let ([answer (eval-one-exp input)])
+          ;; TODO: are there answers that should display differently?
+          (if (eqv? answer (void))
+            (rep)
+            (begin 
+              (eopl:pretty-print answer) 
+              (newline)
+              (rep))))))))  ; tail-recursive, so stack doesn't grow.
 
 (define eval-one-exp
   (lambda (x) (top-level-eval (syntax-expand (parse-exp x)))))
