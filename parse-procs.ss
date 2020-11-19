@@ -134,6 +134,9 @@
                                                                     (map (lambda (x) 
                                                                            (map parse-exp (cdr x)))
                                                                          (cdr datum)))]
+                  [(eqv? (1st datum) 'break) (if (< (length datum) 2)
+                                               (break-exp)
+                                               (break-val-exp (parse-exp (2nd datum))))]
                   [(eqv? (1st datum) 'while) (if (< (length datum) 3)
                                                (eopl:error 'parse-exp
                                                            "while body cannot be empty: ~s"

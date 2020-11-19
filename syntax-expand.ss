@@ -104,4 +104,6 @@
            (define-exp id (syntax-expand val))]
       [var-exp (id) exp]
       [lit-exp (lit) exp]
+      [break-exp () exp]
+      [break-val-exp (val-exp) exp]
     )))

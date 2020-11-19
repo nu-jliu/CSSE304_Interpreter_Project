@@ -125,7 +125,10 @@
     (bodies (list-of expression?))]
   [define-exp
     (id symbol?)
-    (val-exp expression?)])
+    (val-exp expression?)]
+  [break-val-exp 
+    (val-exp expression?)]
+  [break-exp])
     
 (define-datatype lit-type lit-type?
   [an-number

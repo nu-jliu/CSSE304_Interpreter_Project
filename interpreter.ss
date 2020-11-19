@@ -50,6 +50,7 @@
         ;     (begin (eval-bodies bodies env) 
         ;            (loop t))
         ;     (eval-exp (app-exp (var-exp 'void) '()) env)))
+        (set! while-k-list (cons k while-k-list))
         (while-loop test-exp bodies env k)]
       [letrec-exp (proc-names idss bodiess letrec-bodies)
         ;(eval-bodies letrec-bodies 
@@ -87,6 +88,19 @@
                     ;                                  (list new-val)
                     ;                                  k)))
                     (define-k id k))]
+      [break-val-exp (val)
+       (let ([num (eval-exp val env (init-k))])
+         (if (< (length while-k-list) num)
+            (eopl:error 'eval-exp "Not enough loop: ~a" exp)
+            (let ([curr-k (list-ref while-k-list (+ 1 num))])
+              (set! while-k-list (list-tail while-k-list (+ 1 num)))
+              (apply-k curr-k (void)))))]
+      [break-exp ()
+        (if (null? while-k-list)
+          (eopl:error 'eval-exp "Break outside while loop: ~a" exp)
+          (let ([curr-k (car while-k-list)])
+            (set! while-k-list (cdr while-k-list))
+            (apply-k curr-k (void))))]
       [else (eopl:error 'eval-exp "Bad abstract syntax: ~a" exp)])))
 
 ; evaluate the list of operands, putting results into a list
@@ -112,7 +126,7 @@
                 ;(make-k (lambda (car-bodies)
                 ;          (eval-bodies (cdr bodies) env k)))
                 (eval-bodies-k (cdr bodies) env k)))))
-
+(define while-k-list '())
 ;(define eval-bodies
 ;  (lambda (body env)
 ;    (if (null? (cdr body))
